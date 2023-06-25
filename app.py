@@ -91,9 +91,7 @@ def register():
             mysql.connection.commit()
             msg = 'Usuario registrado exitosamente'
             print(fechaCreacion)
-    elif request.method == 'POST':
-        # If form is empty
-        msg = 'Llena todos los campos'
+
     return render_template('/auth/register.html', msg=msg)
 
 if __name__ == '__main__':
