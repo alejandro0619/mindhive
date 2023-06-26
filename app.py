@@ -63,8 +63,7 @@ def register():
         return redirect(url_for("homePage"))
 
     # Check if required fields exist in the form
-    elif request.method == 'POST' and 'email' in request.form and 'nombre' in request.form and 'apellido' in request.form and "password" in request.form and "confirmarPassword" in request.form:
-       
+    elif request.method == 'POST' and all(field in request.form for field in ['email', 'nombre', 'apellido', 'password', 'confirmarPassword']):  
         # Variables creation
         email = request.form['email']
         nombre = request.form["nombre"]+" "+request.form["apellido"]
