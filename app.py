@@ -23,8 +23,11 @@ def route():
 def login():
     
     msg = ''
+    #check if user is logged in to redirect to homepage
+    if "loggedin" in session: 
+        return redirect(url_for("homePage"))
     # Check if username and password fields exist in the form
-    if request.method == 'POST' and 'username' in request.form and 'password' in request.form:
+    elif request.method == 'POST' and 'username' in request.form and 'password' in request.form:
         # Variables creation
         username = request.form['username']
         password = request.form['password']
@@ -44,7 +47,8 @@ def login():
             session['loggedin'] = True
             session['uid'] = account['uid']
             session['email'] = account['email']
-            return 'Inicio de sesión exitoso'
+            session["user_name"] = account["user_name"]
+            return redirect(url_for('homePage'))
         else:
             # Log-in failure
             msg = 'Email o contraseña incorrectas'
@@ -53,10 +57,13 @@ def login():
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-
     msg = ''
+    #check if user is logged in to redirect to homepage
+    if "loggedin" in session: 
+        return redirect(url_for("homePage"))
+
     # Check if required fields exist in the form
-    if request.method == 'POST' and 'email' in request.form and 'nombre' in request.form and 'apellido' in request.form and "password" in request.form and "confirmarPassword" in request.form:
+    elif request.method == 'POST' and 'email' in request.form and 'nombre' in request.form and 'apellido' in request.form and "password" in request.form and "confirmarPassword" in request.form:
        
         # Variables creation
         email = request.form['email']
@@ -90,9 +97,30 @@ def register():
             cursor.execute('INSERT INTO user VALUES (NULL, %s, %s, %s, %s)', (nombre, email, password, fechaCreacion))
             mysql.connection.commit()
             msg = 'Usuario registrado exitosamente'
-            print(fechaCreacion)
-
+    elif request.method == "POST":   
+           msg = 'Llena todos los campos'
     return render_template('/auth/register.html', msg=msg)
+
+@app.route("/logout")
+def logout():
+    #Logout endpoint that logs the user out and redirects it to login page
+    session.pop("loggedin", None)
+    session.pop ('uid', None)
+    session.pop ('email', None)
+    session.pop ("user_name", None)
+    return redirect(url_for("login"))
+
+@app.route("/home", methods=['GET', 'POST'])
+def homePage():
+    #If request method is post, redirect to logout
+    if request.method == "POST":  
+        return redirect(url_for("logout"))
+    #if request is get, check if the user is logged in to show home.html, otherwise, redirect to login
+    elif request.method == "GET":
+        if "loggedin" in session: 
+            return render_template("home.html")
+        else:
+            return redirect(url_for("login"))
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -183,7 +183,6 @@ CREATE TABLE IF NOT EXISTS `user` (
   `user_creation_date` date NOT NULL,
   PRIMARY KEY (`uid`),
   UNIQUE KEY `email_UNIQUE` (`email`),
-  UNIQUE KEY `password_hash_UNIQUE` (`password_hash`),
   UNIQUE KEY `uid_UNIQUE` (`uid`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
