@@ -117,7 +117,7 @@ def homePage():
     #if request is get, check if the user is logged in to show home.html, otherwise, redirect to login
     elif request.method == "GET":
         if "loggedin" in session: 
-            return render_template("home.html")
+            return render_template("projectList.html")
         else:
             return redirect(url_for("login"))
 
