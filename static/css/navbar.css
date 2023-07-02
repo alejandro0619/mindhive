@@ -45,10 +45,7 @@
      /* Add padding to the right */
   }
 
-.navlogo {
-    padding-right: 20px;
-    
-}
+
   
   /* Add margin to the dropdown menu to position it to the left */
   .dropdown-menu-right {
@@ -88,4 +85,23 @@
         right: 0;
         left: auto;
         padding-right: 40px;
+    }
+
+    .squircle {
+      position: absolute;
+      top: 1;
+      left: 1;
+      right: 1;
+      bottom: 1;
+      width: 80%;
+      height: 50%;
+      border-radius: 15%;
+      background-color: transparent;
+      border: 1px solid black;
+      box-sizing: border-box;
+    }
+
+    .line {
+      border-top: 1px solid black;
+      margin-top: 8px;
     }
