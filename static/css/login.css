@@ -67,3 +67,7 @@ html {
 .form-inline {
   display: inline-block;
 }
+
+.navbar {
+  margin-bottom: 20px;
+}

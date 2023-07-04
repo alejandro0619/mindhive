@@ -1,0 +1,107 @@
+/* navbar.css */
+
+/* Customize the background color of the navbar */
+.navbar {
+    background-color: #343a40;
+  }
+  
+  /* Customize the color of the navbar links */
+  .navbar-dark .navbar-nav .nav-link {
+    color: #ffffff;
+  }
+  
+  /* Style the dropdown menu */
+  .dropdown-menu {
+    background-color: #343a40;
+    border: none;
+  }
+  
+  /* Style the dropdown menu items */
+  .dropdown-item {
+    color: #ffffff;
+  }
+  
+  /* Style the dropdown menu items on hover */
+  .dropdown-item:hover {
+    background-color: #343a40;
+    color: #ffffff;
+  }
+  
+  /* Style the dropdown toggle button */
+  .navbar-dark .navbar-toggler {
+    border-color: #ffffff;
+  }
+  
+  /* Style the dropdown toggle button icon */
+  .navbar-dark .navbar-toggler-icon {
+    background-color: #ffffff;
+  }
+  
+ 
+/* Style the navbar brand */
+.navbar-brand {
+    color: #ffffff;
+    font-weight: bold;
+     /* Add padding to the right */
+  }
+
+
+  
+  /* Add margin to the dropdown menu to position it to the left */
+  .dropdown-menu-right {
+    right: 0;
+    left: auto;
+    padding-right: 40px; /* Add padding to the right */
+  }
+  
+  /* Add margin to the navbar items to align them to the right */
+  .navbar-nav.ml-auto {
+    margin-left: auto;
+  }
+
+  .navbar2 {
+    background-color: #ffffff;
+    /* Add additional styles for the second navbar */
+  }
+  
+  .navbar2 .navbar-nav .nav-link {
+    color: #000000;
+    /* Customize the color of the navbar links for the second navbar */
+  }
+
+  .nav2text {
+    color: #000000;
+    
+}
+
+    .alignleft {
+        left:0;
+        margin-left:0;
+        padding-left: 20px;
+        padding-top: 7px;
+    }
+
+    .rightalign {
+        right: 0;
+        left: auto;
+        padding-right: 40px;
+    }
+
+    .squircle {
+      position: absolute;
+      top: 1;
+      left: 1;
+      right: 1;
+      bottom: 1;
+      width: 80%;
+      height: 50%;
+      border-radius: 15%;
+      background-color: transparent;
+      border: 1px solid black;
+      box-sizing: border-box;
+    }
+
+    .line {
+      border-top: 1px solid black;
+      margin-top: 8px;
+    }
