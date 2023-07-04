@@ -117,7 +117,31 @@ def homePage():
     #if request is get, check if the user is logged in to show home.html, otherwise, redirect to login
     elif request.method == "GET":
         if "loggedin" in session: 
-            return render_template("projectList.html")
+            cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+
+            query = """
+                SELECT *
+                FROM project
+                JOIN User_has_project ON project.project_id = User_has_project.Project_project_id
+                JOIN user ON project.User_project_creator = user.uid
+                WHERE User_has_project.User_uid = %s
+                GROUP BY project.project_id, project.project_title
+                """
+            
+            cursor.execute(query, (session["uid"],))
+            projects = [project for project in cursor.fetchall()]
+            
+
+            for project in projects:
+                project_id = project['project_id']  
+                count_query = "SELECT COUNT(User_uid) AS participant_count FROM User_has_project WHERE Project_project_id = %s"
+                cursor.execute(count_query, (project_id,))
+                participant_count = cursor.fetchone()['participant_count']
+                project['participant_count'] = participant_count
+
+            print(projects)
+            return render_template("projectList.html", projects=projects)
+
         else:
             return redirect(url_for("login"))
 
