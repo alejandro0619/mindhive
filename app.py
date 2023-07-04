@@ -122,8 +122,8 @@ def homePage():
             query = """
                 SELECT *
                 FROM project
-                JOIN User_has_project ON project.project_id = User_has_project.Project_project_id
-                JOIN user ON project.User_project_creator = user.uid
+                INNER JOIN User_has_project ON project.project_id = User_has_project.Project_project_id
+                INNER JOIN user ON project.User_project_creator = user.uid
                 WHERE User_has_project.User_uid = %s
                 GROUP BY project.project_id, project.project_title
                 """
@@ -144,6 +144,16 @@ def homePage():
 
         else:
             return redirect(url_for("login"))
+
+@app.route("/profile", methods=['GET', 'POST'])
+def ProfileView():
+    if request.method == "GET":
+        return render_template("profile.html")
+
+@app.route("/createProject", methods=['GET', 'POST'])
+def CreateView():
+    if request.method == "GET":
+        return render_template("projectCreate.html")
 
 if __name__ == '__main__':
     app.run(debug=True)
