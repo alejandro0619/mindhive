@@ -1,6 +1,7 @@
 from flask import Flask, redirect, render_template, url_for, request, session
 from flask_mysqldb import MySQL
 import MySQLdb.cursors
+import pymysql
 import MySQLdb.cursors, re, hashlib
 from datetime import date
 app = Flask(__name__)
