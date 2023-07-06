@@ -49,6 +49,7 @@ def login():
             session['uid'] = account['uid']
             session['email'] = account['email']
             session["user_name"] = account["user_name"]
+            session["password"] = password
             return redirect(url_for('homePage'))
         else:
             # Log-in failure
@@ -108,6 +109,7 @@ def logout():
     session.pop ('uid', None)
     session.pop ('email', None)
     session.pop ("user_name", None)
+    session.pop ("password", None)
     return redirect(url_for("login"))
 
 @app.route("/home", methods=['GET', 'POST'])
@@ -148,8 +150,91 @@ def homePage():
 
 @app.route("/profile", methods=['GET', 'POST'])
 def ProfileView():
+    msg = ""
+
+    if request.method == "POST":
+        # Variable creation
+        email = request.form['email']
+        nombre = request.form["nombre"]
+        password = request.form['password']
+        newPassword = request.form["newPassword"]
+        confirmarNewPassword = request.form["confirmarNewPassword"]
+
+        # Check if the email has already been taken by another user
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute('SELECT * FROM user WHERE email = %s', (email,))
+        account = cursor.fetchone()
+
+        # If email is already in use by a different user
+        if account and account['uid'] != session['uid']:
+            msg = 'Este email ya está en uso'
+        # If email fails regex verification
+        elif not re.match(r'[^@]+@[^@]+\.[^@]+', email):
+            msg = 'Dirección e-mail inválida'
+
+        # Fetch the password from the database if not found in session
+        if 'password' not in session:
+            cursor.execute('SELECT password_hash FROM user WHERE uid = %s', (session['uid'],))
+            password_hash = cursor.fetchone()
+            if password_hash:
+                session['password'] = password_hash['password_hash']
+
+        # If password fields are not empty, perform password verification
+        if password or newPassword or confirmarNewPassword:
+            # Verify the current password
+            hash = password + app.secret_key
+            hash = hashlib.sha1(hash.encode())
+            password = hash.hexdigest()
+            if password != session["password"]:
+                msg = "La contraseña actual es incorrecta"
+            # Verify the new password and confirmation
+            elif newPassword != confirmarNewPassword:
+                msg = "Las contraseñas no coinciden"
+
+        # If there are no validation errors, update the user information
+        if not msg:
+            cursor.execute(
+                """UPDATE user SET user_name = %s, email = %s
+                WHERE uid = %s;""",
+                (nombre, email, session["uid"])
+            )
+            mysql.connection.commit()
+
+            # Update the session data with the new values
+            session["user_name"] = nombre
+            session["email"] = email
+
+            if newPassword:
+                # Update the password if a new password is provided
+                hash = newPassword + app.secret_key
+                hash = hashlib.sha1(hash.encode())
+                newPassword = hash.hexdigest()
+                cursor.execute(
+                    """UPDATE user SET password_hash = %s
+                    WHERE uid = %s;""",
+                    (newPassword, session["uid"])
+                )
+                mysql.connection.commit()
+
+            msg = "Edición satisfactoria"
+            session.pop("loggedin", None)
+            session.pop ('uid', None)
+            session.pop ('email', None)
+            session.pop ("user_name", None)
+            session.pop ("password", None)
+            return redirect(url_for("login"))
+
     if request.method == "GET":
-        return render_template("profile.html")
+        if "loggedin" in session:
+            return render_template("profile.html", msg=msg)
+        else:
+            return redirect(url_for("login"))
+
+    return render_template("profile.html", msg=msg)
+
+
+
+        
 
 @app.route("/createProject", methods=['GET', 'POST'])
 def CreateView():

@@ -30,15 +30,16 @@
     </div>
 </nav>
 
-<form class="form-signin" action="/register" method="POST">
+<form class="form-signin" action="/profile" method="POST">
     <h3></h3>
     <h3><strong>Edición de perfil</strong></h3>
+    <h5>Edita los campos de tu perfil que deseas modificar</h5>
     <div class="form-floating">
         <input type="email" class="form-control" id="email" name="email" placeholder="email" value="{{ session['email'] }}">
         <label for="email">E-mail</label>
     </div>
     <div class="form-floating mt-2">
-        <input type="text" class="form-control" id="nombre" name="nombre" placeholder="nombre" value="{{ session['user_name'] }}">
+        <input type="text" class="form-control" id="nombre" name="nombre" placeholder="nombre" value="{{ session['user_name']}}">
         <label for="nombre">Nombre</label>
     </div>
     <div class="form-floating mt-2">
@@ -46,18 +47,17 @@
         <label for="password">Contraseña Actual</label>
     </div>
     <div class="form-floating mt-2">
-        <input type="password" class="form-control" id="confirmarPassword" name="confirmarPassword" placeholder="confirmarPassword">
-        <label for="password">Contraseña nueva</label>
+        <input type="password" class="form-control" id="newPassword" name="newPassword" placeholder="newPassword">
+        <label for="password">Contraseña Nueva</label>
     </div>
     <div class="form-floating mt-2">
-        <input type="password" class="form-control" id="confirmarPassword" name="confirmarPassword" placeholder="confirmarPassword">
+        <input type="password" class="form-control" id="confirmarNewPassword" name="confirmarNewPassword" placeholder="confirmarNewPassword">
         <label for="password">Confirmar Contraseña Nueva</label>
     </div>
     <div class="msg">{{ msg }}</div>
-    <button class="w-100 btn btn-lg btn-primary" type="submit">Registrarse</button>
-    <p class="mt-3">¿Ya tienes cuenta? <a href="/login">Inicia Sesión aquí</a></p>
+    <button class="w-100 btn btn-lg btn-primary" type="submit">Editar Datos</button>
 </form>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-{% endblock
+{% endblock %}
