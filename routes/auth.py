@@ -1,9 +1,8 @@
 from flask import redirect, render_template, url_for, request, session, Blueprint, current_app
 from flask_mysqldb import MySQL
 import MySQLdb.cursors
-import MySQLdb.cursors
-import re
 import hashlib
+import re
 from datetime import date
 
 auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
@@ -13,9 +12,9 @@ auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
 def login():
     mysql = current_app.config['MYSQL']
     msg = ''
-    # check if user is logged in to redirect to homepage
+    # check if user is logged in to redirect to userpage
     if "loggedin" in session:
-        return redirect(url_for("homePage"))
+        return redirect(url_for("user.dashboard"))
     # Check if username and password fields exist in the form
     elif request.method == 'POST' and 'username' in request.form and 'password' in request.form:
         # Variables creation
@@ -39,7 +38,7 @@ def login():
             session['uid'] = account['uid']
             session['email'] = account['email']
             session["user_name"] = account["user_name"]
-            return redirect(url_for('home.home'))
+            return redirect(url_for('user.dashboard'))
         else:
             # Log-in failure
             msg = 'Email o contraseña incorrectas'
@@ -50,9 +49,9 @@ def login():
 def signup():
     mysql = current_app.config['MYSQL']
     msg = ''
-    # check if user is logged in to redirect to homepage
+    # check if user is logged in to redirect to userpage
     if "loggedin" in session:
-        return redirect(url_for("home.home"))
+        return redirect(url_for("user.dashboard"))
 
     # Check if required fields exist in the form
     elif request.method == 'POST' and all(field in request.form for field in ['email', 'nombre', 'apellido', 'password', 'confirmarPassword']):
@@ -92,3 +91,12 @@ def signup():
     elif request.method == "POST":
         msg = 'Llena todos los campos'
     return render_template('/auth/register.html', msg=msg)
+
+@auth_bp.route("/logout")
+def logout():
+    # Logout endpoint that logs the user out and redirects it to login page
+    session.pop("loggedin", None)
+    session.pop('uid', None)
+    session.pop('email', None)
+    session.pop("user_name", None)
+    return redirect(url_for("auth.login"))
