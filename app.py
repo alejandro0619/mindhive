@@ -1,4 +1,4 @@
-from flask import Flask, redirect, render_template, url_for, request, session
+from flask import Flask
 from flask_mysqldb import MySQL
 
 from routes.auth import auth_bp
@@ -10,7 +10,7 @@ from config import Config
 # Factory disptaches an instance of the app
 def make_app():
     app = Flask(__name__)
-    config = Config() # Build an instance of 
+    config = Config() # Build an instance of
     config.MYSQL = MySQL(app)
 
     app.config.from_object(config)

@@ -1,5 +1,3 @@
-from flask_mysqldb import MySQL
-from flask import current_app
 from platform import os
 
 class Config:
