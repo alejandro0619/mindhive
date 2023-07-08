@@ -3,9 +3,61 @@
 {% block title %}Login{% endblock %}
 
 {% block customCSS %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
 {% endblock %}
 
 {% block body %}
-<h1>Bienvenido</h1>
+<nav class="navbar navbar-expand-sm navbar-dark bg-dark">
+    <row>
+        <a class="alignleft"></a>
+        <a><img src="{{ url_for('static', filename='img/logo2.png') }}" alt="" width="30" height="30"/></a>
+        <a class="navbar-brand" href="/home">Mindhive</a>
+    </row>
+
+    <div class="collapse navbar-collapse" id="navbarsExample03">
+        <ul class="navbar-nav ml-auto">
+            <li>
+                <img src="{{ url_for('static', filename='img/notification.png') }}" alt="" width="30" height="30"/>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="http://example.com" id="dropdown03" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ session["user_name"] }}</a>
+                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdown03">
+                    <a class="dropdown-item" href="/profile">Perfil</a>
+                    <a class="dropdown-item" href="/logout">Cerrar sesión</a>
+                </div>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<form class="form-signin" action="/profile" method="POST">
+    <h3></h3>
+    <h3><strong>Edición de perfil</strong></h3>
+    <h5>Edita los campos de tu perfil que deseas modificar</h5>
+    <div class="form-floating">
+        <input type="email" class="form-control" id="email" name="email" placeholder="email" value="{{ session['email'] }}">
+        <label for="email">E-mail</label>
+    </div>
+    <div class="form-floating mt-2">
+        <input type="text" class="form-control" id="nombre" name="nombre" placeholder="nombre" value="{{ session['user_name']}}">
+        <label for="nombre">Nombre</label>
+    </div>
+    <div class="form-floating mt-2">
+        <input type="password" class="form-control" id="password" name="password" placeholder="Password">
+        <label for="password">Contraseña Actual</label>
+    </div>
+    <div class="form-floating mt-2">
+        <input type="password" class="form-control" id="newPassword" name="newPassword" placeholder="newPassword">
+        <label for="password">Contraseña Nueva</label>
+    </div>
+    <div class="form-floating mt-2">
+        <input type="password" class="form-control" id="confirmarNewPassword" name="confirmarNewPassword" placeholder="confirmarNewPassword">
+        <label for="password">Confirmar Contraseña Nueva</label>
+    </div>
+    <div class="msg">{{ msg }}</div>
+    <button class="w-100 btn btn-lg btn-primary" type="submit">Editar Datos</button>
+</form>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 {% endblock %}
