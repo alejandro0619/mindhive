@@ -239,6 +239,7 @@ def ProfileView():
 @app.route("/createProject", methods=['GET', 'POST'])
 def CreateView():
     if request.method == "GET":
+        
         return render_template("projectCreate.html")
 
 if __name__ == '__main__':
