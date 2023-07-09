@@ -71,11 +71,11 @@ def profile_view():
             msg = 'Dirección e-mail inválida'
 
         # Fetch the password from the database if not found in session
-        if 'password' not in session:
-            cursor.execute('SELECT password_hash FROM user WHERE uid = %s', (session['uid'],))
-            password_hash = cursor.fetchone()
-            if password_hash:
-                session['password'] = password_hash['password_hash']
+        
+        cursor.execute('SELECT password_hash FROM user WHERE uid = %s', (session['uid'],))
+        password_hash = cursor.fetchone()
+        if password_hash:
+            session['password'] = password_hash['password_hash']
 
         # If password fields are not empty, perform password verificatio
         if password and newPassword and confirmarNewPassword:

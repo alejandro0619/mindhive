@@ -64,34 +64,43 @@
         <div class="collapse navbar-collapse" id="navbarsExample03">
             <ul class="navbar-nav ml-auto">
                 <li>
-                    <div style="padding-right: 20px; padding-top: 27px;"">
+                    <div style="padding-right: 30px; padding-top: 27px;"">
                         <!-- Create project button -->
                         <a class="w-100 h-30 btn btn-sm btn-primary" href="/createProject" style="background-color: darkgreen; display: block; text-align: center; line-height: 20px;">¡Crea un proyecto!</a>
 
                     </div>
                 </li>
                 <form action="/adduser" method="POST">
-                    <li>
+                    <div class="row">
+                        <div class="col-sm-8">
+                            <li>
                     
-                        <div style="padding-right: 5px;"">
-                            <p class="mb-0"><strong>Unirse a un proyecto</strong></p>
-                        <!-- Input field for joining a project -->
-                            <input type="text" class="form-control" id="joinProject" name="joinProject" placeholder="Código de proyecto">
-                                <div class="msg">
-                                    {{msg}}
+                                <div >
+                                    <p class="mb-0"><strong>Unirse a un proyecto</strong></p>
+                                <!-- Input field for joining a project -->
+                                    <input type="text" class="form-control" id="joinProject" name="joinProject" placeholder="Código de proyecto">
+                                        <div class="msg">
+                                            {{msg}}
+                                        </div>
+                                    </input>
+                                    
                                 </div>
-                            </input>
-                            
+                            </li>
                         </div>
-                    </li>
-                    <li>
-                        <div style="padding-right: 20px; padding-top: 27px;">
-                                <!-- Button for joining a project -->
-                                <div style="text-align:left;">
-                                    <button class="w-20 btn btn-sm btn-primary" style="background-color: darkgreen;" type="submit">+</button>
+                        <div class="col-sm-1">
+                            <li>
+                                <div style="padding-right: 10px; padding-top: 27px;">
+                                        <!-- Button for joining a project -->
+                                        <div>
+                                            <button class="w-20 btn btn-sm btn-primary" style="background-color: darkgreen;" type="submit">+</button>
+                                        </div>
                                 </div>
+                            </li>
                         </div>
-                    </li>
+
+                    </div>
+                    
+                    
                 </form>
                            
             </ul>
