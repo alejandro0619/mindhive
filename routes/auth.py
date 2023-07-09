@@ -14,7 +14,7 @@ def login():
     msg = ''
     # check if user is logged in to redirect to userpage
     if "loggedin" in session:
-        return redirect(url_for("user.dashboard"))
+        return redirect(url_for("user.root"))
     # Check if username and password fields exist in the form
     elif request.method == 'POST' and 'username' in request.form and 'password' in request.form:
         # Variables creation
@@ -38,7 +38,7 @@ def login():
             session['uid'] = account['uid']
             session['email'] = account['email']
             session["user_name"] = account["user_name"]
-            return redirect(url_for('user.dashboard'))
+            return redirect(url_for('user.root'))
         else:
             # Log-in failure
             msg = 'Email o contraseña incorrectas'
@@ -51,7 +51,7 @@ def signup():
     msg = ''
     # check if user is logged in to redirect to userpage
     if "loggedin" in session:
-        return redirect(url_for("user.dashboard"))
+        return redirect(url_for("user.root"))
 
     # Check if required fields exist in the form
     elif request.method == 'POST' and all(field in request.form for field in ['email', 'nombre', 'apellido', 'password', 'confirmarPassword']):

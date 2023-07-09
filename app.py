@@ -7,7 +7,7 @@ from routes.user import user_bp
 # Config:
 from config import Config
 
-# Factory disptaches an instance of the app
+# Factory dispatches an instance of the app
 def make_app():
     app = Flask(__name__)
     config = Config() # Build an instance of
