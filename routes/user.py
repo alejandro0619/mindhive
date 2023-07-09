@@ -16,15 +16,24 @@ def root():
 
 @user_bp.route("/dashboard/filter", methods=['GET', 'POST'])
 def dashboard():
+    # We import the current instance of mysql and create a cursor instance
     mysql = current_app.config['MYSQL']
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    # Filters labels and the filter type by through the request
+    filters_labels = ['Todos', 'Creados', 'Fecha inicio', 'Fecha de cierre']
+    filter_type = int(request.args['by'])
+    query = dispatcher(filter_type)
+
+    # Project joining message
+    project_joining_message = request.args.get('msg', '')
     # If request method is post, redirect to logout
     if request.method == "POST":
         return redirect(url_for("auth.logout"))
+
     # if request is get, check if the user is logged in to show home.html, otherwise, redirect to login
     elif request.method == "GET":
         if "loggedin" in session:
-            cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-            query = dispatcher(int(request.args['by']))
+
             cursor.execute(query, (session["uid"],))
             projects = [project for project in cursor.fetchall()]
             for project in projects:
@@ -33,7 +42,7 @@ def dashboard():
                 cursor.execute(count_query, (project_id,))
                 participant_count = cursor.fetchone()['participant_count']
                 project['participant_count'] = participant_count
-            return render_template("projectList.html", projects=projects)
+            return render_template("projectList.html", projects=projects, filter = filters_labels[filter_type - 1], msg = project_joining_message)
 
         else:
             return redirect(url_for("auth.login"))
@@ -172,6 +181,7 @@ def add_member():
         mysql = current_app.config['MYSQL']
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         user_uid = session["uid"]
+        
         shareable_code = request.form['joinProject']
 
         obtain_project_id_query = """
@@ -187,8 +197,9 @@ def add_member():
             mysql.connection.commit()
             msg="Te uniste al projecto"
         else:
-            msg="El codigo ingreso no existe para ningún proyecto actual"
-        return redirect(url_for("user.root"))
+            msg="Proyecto no encontrado"
+        # Redirect to the dashboard filtering by all projects by default and sending the resulting message when tried to join to a project
+        return redirect(url_for("user.dashboard", by = 1, msg = msg))
 
 @user_bp.route("/viewProject/<id>", methods=['GET'])
 def project_view(id):
