@@ -2,5 +2,11 @@
   "[python]": {
     "editor.defaultFormatter": "ms-python.autopep8"
   },
-  "python.formatting.provider": "none"
+  "python.formatting.provider": "none",
+  "inlineSQL.enableDBIntegration": true,
+  "inlineSQL.dbDriver": "mysql",
+  "inlineSQL.dbHost": "localhost",
+  "inlineSQL.dbPort": 3306,
+  "inlineSQL.dbUser": "root",
+  "inlineSQL.dbPassword": ""
 }

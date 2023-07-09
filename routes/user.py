@@ -24,9 +24,7 @@ def dashboard():
     elif request.method == "GET":
         if "loggedin" in session:
             cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-            print(request.args['by'])
             query = dispatcher(int(request.args['by']))
-            print(query)
             cursor.execute(query, (session["uid"],))
             projects = [project for project in cursor.fetchall()]
             for project in projects:
@@ -65,13 +63,13 @@ def profile_view():
 
         # Fetch the password from the database if not found in session
         if 'password' not in session:
-            cursor.execute('SELECT password_hash FROM user WHERE uid = %s', (session['uid']))
+            cursor.execute('SELECT password_hash FROM user WHERE uid = %s', (session['uid'],))
             password_hash = cursor.fetchone()
             if password_hash:
                 session['password'] = password_hash['password_hash']
 
-        # If password fields are not empty, perform password verification
-        if password or newPassword or confirmarNewPassword:
+        # If password fields are not empty, perform password verificatio
+        if password and newPassword and confirmarNewPassword:
             # Verify the current password
             hash = password + current_app.secret_key
             hash = hashlib.sha1(hash.encode())
@@ -107,12 +105,7 @@ def profile_view():
                 )
                 mysql.connection.commit()
 
-            session.pop("loggedin", None)
-            session.pop ('uid', None)
-            session.pop ('email', None)
-            session.pop ("user_name", None)
-            session.pop ("password", None)
-            return redirect(url_for("auth.login"))
+            return redirect(url_for("auth.logout"))
     if request.method == "GET":
         if "loggedin" in session:
             return render_template("profile.html", msg=msg)

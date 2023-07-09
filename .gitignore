@@ -1,3 +1,4 @@
 mindhive_env/
 __pycache__
 report_linter.txt
+.vscode
