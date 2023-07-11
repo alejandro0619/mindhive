@@ -187,15 +187,32 @@ def add_member():
         obtain_project_id_query = """
         SELECT project_id FROM project WHERE shareable_code = %s
         """
-        cursor.execute(obtain_project_id_query, (shareable_code,))
 
+        cursor.execute(obtain_project_id_query, (shareable_code,))
         project_id_query_result = cursor.fetchone()
 
+        
+
         if project_id_query_result:
-            join_project_query = """INSERT INTO user_has_project VALUES (%s,%s)"""
-            cursor.execute(join_project_query, (user_uid, project_id_query_result['project_id'],))
-            mysql.connection.commit()
-            msg="Te uniste al projecto"
+
+            #If the query finds a project, then another query will be executed to check whether the user is already in that project or not
+            check_user_in_project = """
+            SELECT User_uid FROM user_has_project WHERE Project_project_id = %s AND User_uid = %s
+            """
+
+            cursor.execute(check_user_in_project, (project_id_query_result['project_id'], session["uid"],))
+            user_in_project_result = cursor.fetchone()
+
+            #if the user is already in that project, then it won't try to insert the same user two times into a project
+            if user_in_project_result:
+                msg="Ya estás en este proyecto"
+
+            else:
+                join_project_query = """INSERT INTO user_has_project VALUES (%s,%s)"""
+                cursor.execute(join_project_query, (user_uid, project_id_query_result['project_id'],))
+                mysql.connection.commit()
+                msg="Te uniste al projecto"
+            
         else:
             msg="Proyecto no encontrado"
         # Redirect to the dashboard filtering by all projects by default and sending the resulting message when tried to join to a project
