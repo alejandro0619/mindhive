@@ -151,6 +151,7 @@ def create_project_view():
         if codes:
             while shareable_code in codes:
                 shareable_code = gen_shareable_code()
+        print("El codigo del proyecto es ", shareable_code)
         # Once the information needed to create the project is filled. I need to create a group chat for this project 
         create_group_chat_query = """
         INSERT INTO group_chat VALUES (NULL)
@@ -190,8 +191,6 @@ def add_member():
 
         cursor.execute(obtain_project_id_query, (shareable_code,))
         project_id_query_result = cursor.fetchone()
-
-        
 
         if project_id_query_result:
 
