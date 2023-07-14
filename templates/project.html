@@ -96,14 +96,41 @@
 
     <div class="row me-0 mt-3">
         <div class="col-sm-3">
-            <h4>Actividades del Proyecto: </h4>
-            
-        </div>
+            <h4>Actividades del Proyecto:</h4>
+            <ul style="list-style-type: none;">
+              {% for activity in activities %}
+              <li>
+                <div>
+                  <h5>{{ activity['activity_name'] }}</h5>
+                </div>
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
+          
         <div class="col-sm-6">
             <h4>Anuncios: </h4>
+            <ul style="list-style-type: none;">
+                {% for announcement in announcements %}
+                <li>
+                  <div>
+                    <h5>{{ announcement['announcement_name'] }}</h5>
+                  </div>
+                </li>
+                {% endfor %}
+              </ul>
         </div>
         <div class="col-sm-3">
             <h4>Participantes: </h4>
+            <ul style="list-style-type: none;">
+                {% for participant in participants %}
+                <li>
+                  <div>
+                    <h5>{{ participant['user_name'] }}</h5>
+                  </div>
+                </li>
+                {% endfor %}
+              </ul>
         </div>
 
     </div>

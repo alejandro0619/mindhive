@@ -151,7 +151,6 @@ def create_project_view():
         if codes:
             while shareable_code in codes:
                 shareable_code = gen_shareable_code()
-        print("El codigo del proyecto es ", shareable_code)
         # Once the information needed to create the project is filled. I need to create a group chat for this project 
         create_group_chat_query = """
         INSERT INTO group_chat VALUES (NULL)
@@ -230,8 +229,33 @@ def project_view(id):
             cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
             cursor.execute(query, (id,))
             project = cursor.fetchone()
-            print(project['project_title'])
-            return render_template("project.html", project_id = id, project = project)
+            
+
+            project_activities="""
+            SELECT activity.activity_name, activity.activity_id FROM activity WHERE Project_project_id = %s  
+              """
+            cursor.execute(project_activities, (id,))
+            activities = [activity for activity in cursor.fetchall()]
+            print(activities)  # Add this line to check the contents of activities
+
+# Rest of the code
+
+            project_announcements= """
+            SELECT * FROM announcement WHERE Project_project_id = %s
+              """
+            cursor.execute(project_announcements, (id,))
+            announcements = [announcement for announcement in cursor.fetchall()]
+
+            project_participants = """
+            SELECT user.user_name, user_has_project.user_uid FROM user_has_project JOIN user ON user.uid = user_has_project.User_uid WHERE user_has_project.Project_project_id = %s
+              """
+            cursor.execute(project_participants, (id,))
+            participants = [user_has_project for user_has_project in cursor.fetchall()]
+            print(activities)
+            print(announcements)
+            print(participants)
+
+            return render_template("project.html", project_id = id, project = project, activities = activities, announcements = announcements, participants=participants)
         else:
             return redirect(url_for("auth.login"))
             
@@ -256,7 +280,6 @@ def create_activity(id):
 """
         cursor.execute(activity_insert, (activity_title, id,))
         test = cursor.fetchall()
-        print(test)
         mysql.connection.commit()
         return redirect(url_for('user.project_view', id=id))     
 
@@ -286,12 +309,11 @@ def create_announcement(id):
 """
         cursor.execute(announcement_insert, (announcement_title, announcement_description, announcement_creation_date, session['uid'], id))
         test = cursor.fetchall()
-        print(test)
         mysql.connection.commit()
         return redirect(url_for('user.project_view', id=id))     
 
     elif request.method == 'GET':
-        if "loggedin" in session:
+        if "loggedin" in session:           
             return render_template("announcementCreate.html", project_id = id,  project = project)
         else:
              return redirect(url_for("auth.login"))
