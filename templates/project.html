@@ -51,13 +51,11 @@
                             <li>
                                 <div>
                                     <p class="mb-0"><strong>Fecha Inicio</strong></p>
-                                   
-                                        <p>
-                                            {{project['starting_date']}}  
-                                        </p>
-                                   
+                                        <p>{{project['starting_date']}}</p>
+                                        <a href="/createActivity/{{project['project_id']}}">
+                                            <button class="btn btn-sm btn-primary" style="background-color: darkgreen;">Añadir Actividad</button>   
+                                        </a>
                                     
-                                    <button class="btn btn-sm btn-primary" style="background-color: darkgreen;">Añadir Actividad</button>   
                                 </div>
                             </li>
                         </div>
@@ -67,7 +65,9 @@
                                 <div>
                                     <p class="mb-0"><strong>Fecha Cierre</strong></p>
                                     <p>{{project['ending_date']}}</p>
-                                    <button class="btn btn-sm btn-primary" style="background-color: darkgreen;">Añadir Anuncio</button>  
+                                    <a href="/createAnnouncement/{{project['project_id']}}">
+                                        <button class="btn btn-sm btn-primary" style="background-color: darkgreen;">Añadir Anuncio</button>   
+                                    </a>
                                 </div>
                             </li>
                         </div>
@@ -94,16 +94,16 @@
     <div class="line"></div>
     
 
-    <div class="row me-0">
+    <div class="row me-0 mt-3">
         <div class="col-sm-3">
-            <h2>Actividades Pendientes: </h2>
+            <h4>Actividades del Proyecto: </h4>
             
         </div>
         <div class="col-sm-6">
-            <p>hola</p>
+            <h4>Anuncios: </h4>
         </div>
         <div class="col-sm-3">
-            <p>hola</p>
+            <h4>Participantes: </h4>
         </div>
 
     </div>
