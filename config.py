@@ -8,9 +8,6 @@ class Config:
     MYSQL_PASSWORD = ''
     MYSQL_DB = 'mindhive'
     MYSQL_UNIX_SOCKET = None
-    MYSQL = None
     def __init__(self):
         if os.name != 'nt':
             self.MYSQL_UNIX_SOCKET = '/opt/lampp/var/mysql/mysql.sock'
-        else:
-            self.MYSQL_UNIX_SOCKET = None

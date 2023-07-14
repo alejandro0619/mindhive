@@ -22,7 +22,7 @@
                 <li>
                     <!-- Notification icon -->
                     <img src="{{ url_for('static', filename='img/notification.png') }}" alt="" width="30" height="30"/>
-                </li>
+                </li> 
                 <li class="nav-item dropdown">
                     <!-- User dropdown menu -->
                     <a class="nav-link dropdown-toggle" href="http://example.com" id="dropdown03" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ session["user_name"] }}</a>
@@ -73,14 +73,14 @@
                 </li>
                 <form action="/adduser" method="POST">
                     <div class="row me-0">
-                        <div class="col-md-8">
+                        <div class="col-md-9 ">
                             <li>
                     
                                 <div >
                                     <p class="mb-0"><strong>Unirse a un proyecto</strong></p>
                                 <!-- Input field for joining a project -->
                                     <input type="text" class="form-control" id="joinProject" name="joinProject" placeholder="Código de proyecto">
-                                        <div class="msg">
+                                        <div class="msg text-align:center">
                                             {{msg}}
                                         </div>
                                     </input>
@@ -88,7 +88,7 @@
                                 </div>
                             </li>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <li>
                                 <div style="padding-top: 27px;">
                                         <!-- Button for joining a project -->

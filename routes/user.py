@@ -229,3 +229,7 @@ def project_view(id):
     hola ='holaaaa'
     print(project['project_title'])
     return render_template("project.html", project_id = id, project = project)
+
+@user_bp.route("/chat/<projectId>", methods=['GET'])
+def project_chat(project_id):
+    return render_template("groupChat.html")
