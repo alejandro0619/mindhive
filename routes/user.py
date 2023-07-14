@@ -151,7 +151,6 @@ def create_project_view():
         if codes:
             while shareable_code in codes:
                 shareable_code = gen_shareable_code()
-        print("El codigo del proyecto es ", shareable_code)
         # Once the information needed to create the project is filled. I need to create a group chat for this project 
         create_group_chat_query = """
         INSERT INTO group_chat VALUES (NULL)
@@ -171,10 +170,12 @@ def create_project_view():
         project_id = cursor.lastrowid
         cursor.execute(insert_into_user_has_project, (user_uid, project_id))
         mysql.connection.commit()
-
+        return redirect(url_for("user.dashboard", by=1))
     elif request.method == "GET":
-        return render_template("projectCreate.html")
-    return redirect(url_for('user.root'))
+        if 'loggedin' in session: 
+            return render_template("projectCreate.html")
+        else: 
+            return redirect(url_for("auth.login"))
 
 @user_bp.route('/adduser', methods=['POST'])
 def add_member():
@@ -219,17 +220,105 @@ def add_member():
 
 @user_bp.route("/viewProject/<id>", methods=['GET'])
 def project_view(id):
-    query = """
-    SELECT * FROM project WHERE project_id = %s
-    """
-    mysql = current_app.config['MYSQL']
-    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    cursor.execute(query, (id,))
-    project = cursor.fetchone()
-    hola ='holaaaa'
-    print(project['project_title'])
-    return render_template("project.html", project_id = id, project = project)
+    if request.method == 'GET':
+        if 'loggedin' in session: 
+            query = """
+            SELECT * FROM project WHERE project_id = %s
+            """
+            mysql = current_app.config['MYSQL']
+            cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+            cursor.execute(query, (id,))
+            project = cursor.fetchone()
+            
 
+            project_activities="""
+            SELECT activity.activity_name, activity.activity_id FROM activity WHERE Project_project_id = %s  
+              """
+            cursor.execute(project_activities, (id,))
+            activities = [activity for activity in cursor.fetchall()]
+            print(activities)  # Add this line to check the contents of activities
+
+# Rest of the code
+
+            project_announcements= """
+            SELECT * FROM announcement WHERE Project_project_id = %s
+              """
+            cursor.execute(project_announcements, (id,))
+            announcements = [announcement for announcement in cursor.fetchall()]
+
+            project_participants = """
+            SELECT user.user_name, user_has_project.user_uid FROM user_has_project JOIN user ON user.uid = user_has_project.User_uid WHERE user_has_project.Project_project_id = %s
+              """
+            cursor.execute(project_participants, (id,))
+            participants = [user_has_project for user_has_project in cursor.fetchall()]
+            print(activities)
+            print(announcements)
+            print(participants)
+
+            return render_template("project.html", project_id = id, project = project, activities = activities, announcements = announcements, participants=participants)
+        else:
+            return redirect(url_for("auth.login"))
+            
 @user_bp.route("/chat/<projectId>", methods=['GET'])
 def project_chat(project_id):
     return render_template("groupChat.html")
+
+@user_bp.route("/createActivity/<id>", methods=['GET', 'POST'])
+def create_activity(id):
+    mysql = current_app.config['MYSQL']
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    query = """
+            SELECT * FROM project WHERE project_id = %s
+            """
+    cursor.execute(query, (id,))
+    project = cursor.fetchone()
+
+    if request.method == "POST":
+        activity_title = request.form['tituloActividad']
+        activity_insert = """
+        INSERT INTO activity VALUES (NULL, %s, %s)
+"""
+        cursor.execute(activity_insert, (activity_title, id,))
+        test = cursor.fetchall()
+        mysql.connection.commit()
+        return redirect(url_for('user.project_view', id=id))     
+
+    elif request.method == 'GET':
+        if "loggedin" in session:
+            return render_template("activityCreate.html", project_id = id,  project = project)
+        else:
+             return redirect(url_for("auth.login"))
+    
+
+@user_bp.route("/createAnnouncement/<id>", methods=['GET', 'POST'])
+def create_announcement(id):
+    mysql = current_app.config['MYSQL']
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    query = """
+            SELECT * FROM project WHERE project_id = %s
+            """
+    cursor.execute(query, (id,))
+    project = cursor.fetchone()
+
+    if request.method == "POST":
+        announcement_title = request.form['tituloAnuncio']
+        announcement_description = request.form['descripcionAnuncio']
+        announcement_creation_date = date.today()
+        announcement_insert = """
+        INSERT INTO announcement VALUES (NULL, %s, %s, %s, %s, %s)
+"""
+        cursor.execute(announcement_insert, (announcement_title, announcement_description, announcement_creation_date, session['uid'], id))
+        test = cursor.fetchall()
+        mysql.connection.commit()
+        return redirect(url_for('user.project_view', id=id))     
+
+    elif request.method == 'GET':
+        if "loggedin" in session:           
+            return render_template("announcementCreate.html", project_id = id,  project = project)
+        else:
+             return redirect(url_for("auth.login"))
+            
+            
+        
+            
+    
