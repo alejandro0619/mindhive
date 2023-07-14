@@ -3,9 +3,126 @@
 {% block title %}Login{% endblock %}
 
 {% block customCSS %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
 {% endblock %}
 
 {% block body %}
-<h1>Bienvenido</h1>
+<body>
+    <!-- Navbar for the top section -->
+    <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
+        <row>
+            <a class="alignleft"></a>
+            <a><img src="{{ url_for('static', filename='img/logo2.png') }}" alt="" width="30" height="30"/></a>
+            <a class="navbar-brand" href="/dashboard/filter?by=1">Mindhive</a>
+        </row>`
+
+        <div class="collapse navbar-collapse" id="navbarsExample03">
+            <ul class="navbar-nav ml-auto">
+                <li>
+                    <!-- Notification icon -->
+                    <img src="{{ url_for('static', filename='img/notification.png') }}" alt="" width="30" height="30"/>
+                </li>
+                <li class="nav-item dropdown">
+                    <!-- User dropdown menu -->
+                    <a class="nav-link dropdown-toggle" href="http://example.com" id="dropdown03" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ session["user_name"] }}</a>
+                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdown03">
+                        <a class="dropdown-item" href="/profile">Perfil</a>
+                        <a class="dropdown-item" href="/auth/logout">Cerrar sesión</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    
+    <!-- Navbar for the bottom section -->
+    <nav class="navbar navbar-expand-sm navbar-dark bg-white">
+        <row class="ms-3">
+            <h3 class="text-align=left mb-3">{{project['project_title']}}</h3>
+            <p class="text-align=left mb-0">"{{project['project_description']}}"</p>
+        </row>
+
+        
+        
+        <div class="collapse navbar-collapse" id="navbarsExample03">
+            <ul class="navbar-nav ml-auto">
+                    <div class="row me-0">
+
+                        <div class="col-sm-4">
+                            <li>
+                                <div>
+                                    <p class="mb-0"><strong>Fecha Inicio</strong></p>
+                                   
+                                        <p>{{project['starting_date']}}</p>
+                                   
+                                    
+                                    <button class="btn btn-sm btn-primary" style="background-color: darkgreen;">Añadir Actividad</button>   
+                                </div>
+                            </li>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <li>
+                                <div>
+                                    <p class="mb-0"><strong>Fecha Cierre</strong></p>
+                                    <p>{{project['ending_date']}}</p>
+                                    <button class="btn btn-sm btn-primary" style="background-color: darkgreen;">Añadir Anuncio</button>  
+                                </div>
+                            </li>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <li>
+                                <div>
+                                    <button class="btn btn-sm btn-primary mt-5 "  style="background-color: rgb(90, 90, 90);">Chat Grupal</button>
+                                    <button class="btn btn-sm btn-primary mt-1"  style="background-color: darkgreen;">Añadir Niembros</button>  
+                                </div>
+                            </li>
+                        </div>
+
+                    </div>
+                    
+                    
+          
+                           
+            </ul>
+        </div>
+
+    
+    </nav>
+    <div class="line"></div>
+    <div>
+        <ul style="list-style-type: none;">
+            {% for project in projects %}
+            <li style="padding: 10px; margin-top: 10px; margin-bottom: 10px; margin-right: 250px; text-align: left; border: 1px solid #000; border-radius: 2%;">
+                <div class="row">
+                    <div class="col-md-8">
+                        <h3>{{ project['project_title'] }}</h3>
+                        <h5>"{{ project['project_description'] }}"</h5>
+                        <h6 class="mt-5">
+                            <span class="mr-2">{{ project['user_name'] }}</span>
+                            &nbsp&nbsp
+                            <span class="mr-2">{{ project['participant_count'] }} participante(s)</span>
+                            &nbsp&nbsp
+                            <span class="mr-2">{{project['starting_date']}}</span>
+                            &nbsp&nbsp
+                            <span>{{project['ending_date']}}</span>
+                        </h6>
+                    </div>
+                    
+                    <div class="col-md-4 text-md-right me-0" style="margin-top: 50px;">
+                        <button class="btn btn-md btn-primary" style="background-color: rgb(23, 28, 23); margin-left: 100px;">
+                            &nbsp&nbsp&nbspEntrar&nbsp&nbsp&nbsp
+                        </button>
+                    </div>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <!-- Include the necessary Bootstrap JavaScript and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
 {% endblock %}
