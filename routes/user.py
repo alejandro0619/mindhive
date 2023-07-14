@@ -318,6 +318,22 @@ def create_announcement(id):
         else:
              return redirect(url_for("auth.login"))
             
+
+@user_bp.route("/shareCode/<id>", methods=['GET'])
+def share_code(id):
+    mysql = current_app.config['MYSQL']
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    query = """
+            SELECT * FROM project WHERE project_id = %s
+            """
+    cursor.execute(query, (id,))
+    project = cursor.fetchone()
+
+    if request.method == 'GET':
+        if "loggedin" in session:           
+            return render_template("addMember.html", project_id = id,  project = project)
+        else:
+             return redirect(url_for("auth.login"))
             
         
             
