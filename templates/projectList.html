@@ -1,6 +1,6 @@
 {% extends './base.html' %}
 
-{% block title %}Login{% endblock %}
+{% block title %}projectList{% endblock %}
 
 {% block customCSS %}
     <!-- Include custom CSS file for navbar styling -->
@@ -48,8 +48,9 @@
                 </li>
                 <li class="nav-item dropdown">
                     <!-- Project filter dropdown menu -->
+                    
                     <a class="nav-link dropdown-toggle" href="http://example.com" id="dropdown03" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: black;background-color: #ffffff;">
-                        <span class="squircle filter "></span> {{ filter }}
+                        <span class="squircle"></span> {{ filter }}
                       </a>
                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdown03">
                         <a class="dropdown-item" href="/dashboard/filter?by=1">Todo</a>
@@ -71,8 +72,8 @@
                     </div>
                 </li>
                 <form action="/adduser" method="POST">
-                    <div class="row">
-                        <div class="col-sm-8">
+                    <div class="row me-0">
+                        <div class="col-md-8">
                             <li>
                     
                                 <div >
@@ -87,9 +88,9 @@
                                 </div>
                             </li>
                         </div>
-                        <div class="col-sm-1">
+                        <div class="col-md-4">
                             <li>
-                                <div style="padding-right: 10px; padding-top: 27px;">
+                                <div style="padding-top: 27px;">
                                         <!-- Button for joining a project -->
                                         <div>
                                             <button class="w-20 btn btn-sm btn-primary" style="background-color: darkgreen;" type="submit">+</button>
@@ -130,9 +131,12 @@
                     </div>
                     
                     <div class="col-md-4 text-md-right" style="margin-top: 50px;">
-                        <button class="btn btn-md btn-primary" style="background-color: rgb(23, 28, 23); margin-left: 100px;">
-                            &nbsp&nbsp&nbspEntrar&nbsp&nbsp&nbsp
-                        </button>
+                        <a href="/viewProject/{{project['project_id']}}">
+                            <button class="btn btn-md btn-primary" style="background-color: rgb(23, 28, 23); margin-left: 100px;">
+                                &nbsp&nbsp&nbspEntrar&nbsp&nbsp&nbsp
+                            </button>
+                        </a>
+                        
                     </div>
                 </div>
             </li>

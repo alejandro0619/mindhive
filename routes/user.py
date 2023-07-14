@@ -220,4 +220,13 @@ def add_member():
 
 @user_bp.route("/viewProject/<id>", methods=['GET'])
 def project_view(id):
-    return render_template("project.html", project_id = id)
+    query = """
+    SELECT * FROM project WHERE project_id = %s
+    """
+    mysql = current_app.config['MYSQL']
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute(query, (id,))
+    project = cursor.fetchone()
+    hola ='holaaaa'
+    print(project['project_title'])
+    return render_template("project.html", project_id = id, project = project)
