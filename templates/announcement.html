@@ -33,41 +33,51 @@
         </div>
     </nav>
 
-    <form method="POST">
+    
 
             
             <h1 class="text-align: left mt-3 mb-3 ms-4" style = "text-align: left;">Anuncio del proyecto</h1>
             <div class="line"></div>
             <div class="row me-3 mt-3 ms-3" style="list-style-type: none; padding-right: 40px; border: 1px solid #000; border-radius: 1%;">
-                <div class="col-sm-9" style="text-align: left; padding-left: 25px;">   
-                    <h6>{{announcement['user_name']}}</h6>      
+                <div class="col-sm-9 mt-3" style="text-align: left; padding-left: 25px;">   
+                    <h4>{{announcement['user_name']}}</h4>      
                 </div>
-                <div class="col-sm-3">
-                    <h6>{{announcement['announcement_date']}}</h6>
+                <div class="col-sm-3 mt-3">
+                    <h5>{{announcement['announcement_Date']}}</h5>
                 </div>
-                <h6 style = "padding-left: 25px; text-align: left;">{{ announcement['announcement_name'] }}</h6>
-                <p style = "padding-left: 25px; text-align: left;">"{{announcement['announcement_description']}}"</p>
+                <div class="line ms-3"></div>
+                <h5 class="mt-3" style = "padding-left: 25px; text-align: left;">{{ announcement['announcement_name'] }}</h5>
+                <h5 style = "padding-left: 25px; text-align: left;">"{{announcement['announcement_description']}}"</h5>
               </div> 
-            
-            <h3 class="ms-5 mt-5"  style="text-align: left;">Titulo del anuncio:</h3>
-            <div class="col-sm-8 ms-5">
-                    <div class="form-floating mt-2">
-                        <input type="text" class="form-control" id="tituloAnuncio" name="tituloAnuncio" placeholder="tituloAnuncio">
-                    </div>
-            </div>
 
-            <h3 class="ms-5 mt-2" style="text-align: left;">Descripción del anuncio:</h3>
-            <div class="col-sm-8 ms-5">
-                <div class="form-floating mt-2">
-                    <textarea class="form-control" id="descripcionAnuncio" name="descripcionAnuncio" placeholder="descripcionAnuncio" style="height: 100px;"></textarea>
+
+            <div class="row me-3 mt-3 ms-3">
+                <div class="col-sm-6" style="text-align: left; padding-left: 25px;">   
+                    <ul> 
+                    {% for comment in comments %}
+                        <li class="mb-3" style="list-style-type: none; padding-right: 40px; border: 1px solid #000; border-radius: 5%;">
+                            <h4 style="padding-left: 25px;">{{ comment.user_name }}</h4>
+                            <h5 style="padding-left: 25px;">{{ comment.comment_content }}</h5>
+                            <h5 style="text-align: right;">{{ comment.comment_date }}</h5>
+                        </li>
+                        
+                    {% endfor %}
+                    </ul>
+                </div>
+                
+                <div class="col-sm-6" style="text-align: left; padding-left: 25px;">   
+                    <form action="/projectAnnouncement/{{announcement['announcement_id']}}" method="POST">
+                        <h3 class="ms-5 mt-2" style="text-align: left;">Añade un comentario:</h3>
+                            <div class="form-floating mt-2">
+                                <textarea class="form-control" id="comentario" name="comentario" placeholder="comentario" style="height: 100px;"></textarea>
+                            </div>
+                        
+                        <div class="ms-5 mt-5 mb-5" style="text-align:left;">
+                            <button class="w-10 btn btn-lg btn-primary" style="background-color: darkgreen;" type="submit">Subir Comentario</button>
+                        </div>
+                    </form>
                 </div>
             </div>
-
-            <div class="ms-5 mt-5 mb-5" style="text-align:left;">
-                <button class="w-10 btn btn-lg btn-primary" style="background-color: darkgreen;" type="submit">Crear Anuncio</button>
-            </div>
-            
-    </form>
  
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

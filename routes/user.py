@@ -336,17 +336,51 @@ def share_code(id):
         else:
              return redirect(url_for("auth.login"))
         
-@user_bp.route("/projectAnnouncement/<id>", methods=['GET'])
+@user_bp.route("/projectAnnouncement/<id>", methods=['GET', 'POST'])
 def announcement(id):
-    mysql = current_app.config['MYSQL']
-    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    query = """
-            SELECT * FROM announcement JOIN user ON user.uid = announcement.user_uid WHERE announcement_id = %s
+     if request.method == 'POST':
+         mysql = current_app.config['MYSQL']
+         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+         commentary = request.form['comentario']
+         commentary_date = date.today()
+         insert_comment = '''
+         INSERT INTO comment VALUES (NULL, %s, %s, %s, %s )            
+        ''' 
+         query = """
+                    SELECT announcement.announcement_id, announcement.announcement_name, announcement.announcement_description, announcement.announcement_Date, User.uid, User.user_name, announcement.project_project_id FROM announcement JOIN user ON user.uid = announcement.user_uid WHERE announcement_id = %s
+                    """
+         cursor.execute(query, (id,))
+         announcement = cursor.fetchone()
+        
+         cursor.execute(insert_comment, (commentary, commentary_date, session['uid'], announcement['announcement_id'],))   
+         mysql.connection.commit()
+         comment_query = """
+            SELECT comment.comment_id, comment_content, comment.comment_date, comment.User_uid, user.user_name  FROM comment JOIN user ON user.uid = comment.User_uid WHERE comment.Announcement_announcement_id = %s;
             """
-    cursor.execute(query, (id,))
-    announcement = cursor.fetchone()
-    print(announcement)
-    return render_template("announcement.html", announcement = announcement, id=id)
+         cursor.execute(comment_query, (announcement['announcement_id'],))
+         comments = [comment for comment in cursor.fetchall()]
+         return render_template("announcement.html", announcement = announcement, comments=comments, id=id)
+     elif request.method == 'GET':
+        if "loggedin" in session: 
+            mysql = current_app.config['MYSQL']
+            cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+            query = """
+                    SELECT announcement.announcement_id, announcement.announcement_name, announcement.announcement_description, announcement.announcement_Date, User.uid, User.user_name, announcement.project_project_id FROM announcement JOIN user ON user.uid = announcement.user_uid WHERE announcement_id = %s
+                    """
+            cursor.execute(query, (id,))
+            announcement = cursor.fetchone()
+
+            comment_query = """
+            SELECT comment.comment_id, comment_content, comment.comment_date, comment.User_uid, user.user_name  FROM comment JOIN user ON user.uid = comment.User_uid WHERE comment.Announcement_announcement_id = %s;
+            """
+            cursor.execute(comment_query, (announcement['announcement_id'],))
+            comments = [comment for comment in cursor.fetchall()]
+            print(comments)
+            print(announcement)
+            
+            return render_template("announcement.html", announcement = announcement, comments=comments, id=id)
+        else:
+            return redirect(url_for("auth.login"))
     
 
     
