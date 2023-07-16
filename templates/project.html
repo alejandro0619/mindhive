@@ -99,36 +99,73 @@
     
 
     <div class="row me-0 mt-3">
-        <div class="col-sm-3">
-            <h4>Actividades del Proyecto:</h4>
-            <ul style="list-style-type: none;">
-              {% for activity in activities %}
-              <li>
-                <div>
-                  <h5>{{ activity['activity_name'] }}</h5>
-                </div>
-              </li>
-              {% endfor %}
+        <div class="col-sm-3" style="padding-left: 50px;">            
+            <ul class="ms-0" style="list-style-type: none; padding-right: 40px; border: 1px solid #000; border-radius: 10%;">
+                <h5>Actividades del Proyecto:</h5>
+                {% for activity in activities %}
+                <li>
+                    <div>
+                        <input type="checkbox" id="activity{{activity['activity_id']}}" name="activity{{activity['activity_id']}}" value="1">
+                        <strong><label for="activity{{activity['activity_id']}}"> {{ activity['activity_name'] }}</label></strong>
+                    </div>
+                    <script>
+                        // Function to save the checkbox state to localStorage
+                        function saveCheckboxState() {
+                            var checkbox = document.getElementById("activity{{activity['activity_id']}}");
+                            localStorage.setItem("activity{{activity['activity_id']}}", checkbox.checked);
+                        }
+                        
+                        // Function to load the checkbox state from localStorage
+                        function loadCheckboxState() {
+                            var checkbox = document.getElementById("activity{{activity['activity_id']}}");
+                            var checkboxState = localStorage.getItem("activity{{activity['activity_id']}}");
+                            
+                            if (checkboxState === "true") {
+                                checkbox.checked = true;
+                            } else {
+                                checkbox.checked = false;
+                            }
+                        }
+                        
+                        // Add event listeners to save and load the checkbox state
+                        var checkbox = document.getElementById("activity{{activity['activity_id']}}");
+                        checkbox.addEventListener("change", saveCheckboxState);
+                        
+                        // Load the checkbox state when the page is loaded
+                        window.addEventListener("load", loadCheckboxState);
+                    </script>
+                </li>
+                {% endfor %}
             </ul>
-          </div>
+        </div>
+        
           
         <div class="col-sm-6">
             <h4>Anuncios: </h4>
             <ul style="list-style-type: none;">
                 {% for announcement in announcements %}
-                <li>
-                  <div>
-                    <h5>{{ announcement['announcement_name'] }}</h5>
+                <li class="mb-2" style="list-style-type: none; padding-right: 40px; border: 1px solid #000; border-radius: 3%;">
+                  <div class="row me-0 mt-3">
+                    <div class="col-sm-9" style="text-align: left; padding-left: 25px;">   
+                        <h6>{{announcement['user_name']}}</h6>      
+                    </div>
+                    <div class="col-sm-3">
+                        <h6>{{announcement['announcement_date']}}</h6>
+                    </div>
+
+                    <h5 style = "padding-left: 25px; text-align: left;">{{ announcement['announcement_name'] }}</h5>
+                    <p style = "padding-left: 25px; text-align: left;">{{announcement['announcement_description']}}</p>
+                    <a href="/projectAnnouncement/{{announcement['announcement_id']}}" style="text-align: right;"><p>Comentarios</p></a>
                   </div>
                 </li>
                 {% endfor %}
               </ul>
         </div>
-        <div class="col-sm-3">
-            <h4>Participantes: </h4>
-            <ul style="list-style-type: none;">
+        <div class="col-sm-3" style="padding-left: 50px;">            
+            <ul class="ms-0" style="padding-right: 40px; border: 1px solid #000; border-radius: 10%;">
+                <h5>Participantes: </h5>
                 {% for participant in participants %}
-                <li>
+                <li style="text-align: left; " >
                   <div>
                     <h5>{{ participant['user_name'] }}</h5>
                   </div>
@@ -142,6 +179,8 @@
     <!-- Include the necessary Bootstrap JavaScript and jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
 </body>
 </html>
 {% endblock %}

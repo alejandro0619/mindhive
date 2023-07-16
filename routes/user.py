@@ -241,10 +241,11 @@ def project_view(id):
 # Rest of the code
 
             project_announcements= """
-            SELECT * FROM announcement WHERE Project_project_id = %s
+            SELECT announcement.announcement_name, announcement.announcement_id, announcement.announcement_description, announcement.announcement_date, User.uid, user.user_name FROM announcement JOIN user on user.uid = announcement.user_uid WHERE Project_project_id = %s 
               """
             cursor.execute(project_announcements, (id,))
             announcements = [announcement for announcement in cursor.fetchall()]
+            print(announcements)
 
             project_participants = """
             SELECT user.user_name, user_has_project.user_uid FROM user_has_project JOIN user ON user.uid = user_has_project.User_uid WHERE user_has_project.Project_project_id = %s
@@ -334,6 +335,21 @@ def share_code(id):
             return render_template("addMember.html", project_id = id,  project = project)
         else:
              return redirect(url_for("auth.login"))
+        
+@user_bp.route("/projectAnnouncement/<id>", methods=['GET'])
+def announcement(id):
+    mysql = current_app.config['MYSQL']
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    query = """
+            SELECT * FROM announcement JOIN user ON user.uid = announcement.user_uid WHERE announcement_id = %s
+            """
+    cursor.execute(query, (id,))
+    announcement = cursor.fetchone()
+    print(announcement)
+    return render_template("announcement.html", announcement = announcement, id=id)
+    
+
+    
             
         
             
