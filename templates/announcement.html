@@ -1,11 +1,138 @@
 {% extends './base.html' %}
 
-{% block title %}Announcement{% endblock %}
+{% block title %}announcement{% endblock %}
 
 {% block customCSS %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
 {% endblock %}
 
 {% block body %}
-<h1>Bienvenido</h1>
+<body>
+    <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
+        <row>
+            <a class="alignleft"></a>
+            <a><img src="{{ url_for('static', filename='img/logo2.png') }}" alt="" width="30" height="30"/></a>
+            <a class="navbar-brand" href="/dashboard/filter?by=1">Mindhive</a>
+        </row>
+
+        <div class="collapse navbar-collapse" id="navbarsExample03">
+            <ul class="navbar-nav ml-auto">
+                <li>
+                    <!-- Notification icon -->
+                    <img src="{{ url_for('static', filename='img/notification.png') }}" alt="" width="30" height="30"/>
+                </li>
+                <li class="nav-item dropdown">
+                    <!-- User dropdown menu -->
+                    <a class="nav-link dropdown-toggle" href="http://example.com" id="dropdown03" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ session["user_name"] }}</a>
+                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdown03">
+                        <a class="dropdown-item" href="/profile">Perfil</a>
+                        <a class="dropdown-item" href="/auth/logout">Cerrar sesión</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    
+
+            
+            <h1 class="text-align: left mt-3 mb-3 ms-4" style = "text-align: left;">Anuncio del proyecto</h1>
+            <div class="line"></div>
+            <div class="row me-3 mt-3 ms-3" style="list-style-type: none; padding-right: 40px; border: 1px solid #000; border-radius: 1%;">
+                <div class="col-sm-9 mt-3" style="text-align: left; padding-left: 25px;">   
+                    
+                    <div class="row">
+                        <div class="col-sm-6 ">
+                            <h4>{{announcement['user_name']}}</h4> 
+                        </div>
+                        <div class="col-sm-6 ">
+                            <select class="me-3" id="{{ announcement['announcement_id'] }}" onchange="modifyAnnouncement('{{ announcement['announcement_id'] }}')"> 
+                                <option value="">...</option>
+                                <option value="editar">Editar Anuncio</option>
+                                <option value="borrar">Borrar Anuncio</option>
+                            </select>
+                        </div>
+                    </div>
+                   
+
+                    <script>
+                        function modifyAnnouncement(announcementId) {
+                          var selectElement = document.getElementById("{{ announcement['announcement_id'] }}");
+                          var selectedOption = selectElement.value;
+                      
+                          if (selectedOption === "editar") {
+                            window.location.href = "/editAnnouncement/"+announcementId;
+                          } else if (selectedOption === "borrar") {
+                            window.location.href = "/deleteAnnouncement/"+announcementId;
+                          } 
+                        }
+                      </script>
+
+                </div>
+                <div class="col-sm-3 mt-3">
+                    <h5>{{announcement['announcement_Date']}}</h5>
+                </div>
+                <div class="line ms-3"></div>
+                <h5 class="mt-3" style = "padding-left: 25px; text-align: left;">{{ announcement['announcement_name'] }}</h5>
+                <h5 style = "padding-left: 25px; text-align: left;">"{{announcement['announcement_description']}}"</h5>
+              </div> 
+
+
+            <div class="row me-3 mt-3 ms-3">
+                <div class="col-sm-6" style="text-align: left; padding-left: 25px;">   
+                    <ul style="list-style-type: none;"> 
+                    {% for comment in comments %}
+                        <li class="mb-3" style="list-style-type: none; padding-right: 40px; border: 1px solid #000; border-radius: 5%;">
+                            <div class="row">
+                                <div class="col-sm-6 ">
+                                    <h4 style="padding-left: 25px;">{{ comment['user_name']}}</h4> 
+                                </div>
+                                <div class="col-sm-6 ">
+                                    <select class="me-3 mt-3" id="select_{{comment['comment_id']}}" onchange="modifyComment('{{ comment['comment_id']}}')"> 
+                                        <option value="">...</option>
+                                        <option value="editar">Editar Comentario</option>
+                                        <option value="borrar">Borrar Comentario</option>
+                                    </select>
+                                </div>
+                            </div>
+                           
+        
+                            
+                            <h5 style="padding-left: 25px;">{{ comment.comment_content }}</h5>
+                            <h5 style="text-align: right;">{{ comment.comment_date }}</h5>
+                        </li>
+                        
+                    {% endfor %}
+                    </ul>
+                    <script>
+                        function modifyComment(commentId) {
+                          var selectElement = document.getElementById("select_" + commentId);
+                          var selectedOption = selectElement.value;
+                      
+                          if (selectedOption === "editar") {
+                            window.location.href = "/editComment/"+commentId;
+                          } else if (selectedOption === "borrar") {
+                            window.location.href = "/deleteComment/"+commentId;
+                          } 
+                        }
+                      </script>
+                </div>
+                
+                <div class="col-sm-6" style="text-align: left; padding-left: 25px;">   
+                    <form action="/projectAnnouncement/{{announcement['announcement_id']}}" method="POST">
+                        <h3 class="ms-5 mt-2" style="text-align: left;">Añade un comentario:</h3>
+                            <div class="form-floating mt-2">
+                                <textarea class="form-control" id="comentario" name="comentario" placeholder="comentario" style="height: 100px;"></textarea>
+                            </div>
+                        
+                        <div class="ms-5 mt-5 mb-5" style="text-align:left;">
+                            <button class="w-10 btn btn-lg btn-primary" style="background-color: darkgreen;" type="submit">Subir Comentario</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+ 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
 {% endblock %}

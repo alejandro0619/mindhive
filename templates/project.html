@@ -40,8 +40,29 @@
             <h3 class="text-align=left mb-3">{{project['project_title']}}</h3>
             <p class="text-align=left mb-0">"{{project['project_description']}}"</p>
         </row>
-
         
+        <select class="ms-5" id="{{ project['project_id'] }}" onchange="modifyProject('{{ project['project_id'] }}')"> 
+            <option value="">...</option>
+            <option value="editar">Editar Proyecto</option>
+            <option value="borrar">Borrar Proyecto</option>
+        </select>
+
+        <a class="ms-5" href="/leaveProject/{{project['project_id']}}">
+            <button class="btn btn-sm btn-primary" style="background-color: darkred;">Salir del Grupo</button>   
+        </a>    
+
+        <script>
+            function modifyProject(project_id) {
+              var selectElement = document.getElementById("{{ project['project_id'] }}");
+              var selectedOption = selectElement.value;
+          
+              if (selectedOption === "editar") {
+                window.location.href = "/editProject/"+project_id;
+              } else if (selectedOption === "borrar") {
+                window.location.href = "/deleteProject/"+project_id;
+              } 
+            }
+          </script>
         
         <div class="collapse navbar-collapse" id="navbarsExample03">
             <ul class="navbar-nav ml-auto">
@@ -54,8 +75,7 @@
                                         <p>{{project['starting_date']}}</p>
                                         <a href="/createActivity/{{project['project_id']}}">
                                             <button class="btn btn-sm btn-primary" style="background-color: darkgreen;">Añadir Actividad</button>   
-                                        </a>
-                                    
+                                        </a>     
                                 </div>
                             </li>
                         </div>
@@ -76,7 +96,11 @@
                             <li>
                                 <div>
                                     <button class="btn btn-sm btn-primary mt-3 "  style="background-color: rgb(0, 0, 0);">Chat Grupal</button>
-                                    <button class="btn btn-sm btn-primary mt-3"  style="background-color: darkgreen;">Añadir Miembros</button>  
+
+                                    <a href="/shareCode/{{project['project_id']}}">
+                                        <button class="btn btn-sm btn-primary mt-3"  style="background-color: darkgreen;">Añadir Miembros</button>  
+                                    </a>
+                                   
                                 </div>
                             </li>
                         </div>
@@ -92,39 +116,117 @@
     
     </nav>
     <div class="line"></div>
-    
 
     <div class="row me-0 mt-3">
-        <div class="col-sm-3">
-            <h4>Actividades del Proyecto:</h4>
-            <ul style="list-style-type: none;">
-              {% for activity in activities %}
-              <li>
-                <div>
-                  <h5>{{ activity['activity_name'] }}</h5>
-                </div>
-              </li>
-              {% endfor %}
+        <div class="col-sm-3" style="padding-left: 50px;">            
+            <ul class="ms-0" style="list-style-type: none; padding-right: 40px; border: 1px solid #000; border-radius: 10%;">
+                <h5>Actividades del Proyecto:</h5>
+             <!-- ...previous code... -->
+
+             <ul style="list-style-type: none;">
+                {% for activity in activities %}
+                
+                <li>
+                    <div class="row me-0 mt-3 mb-3">
+                        <div class="col-sm-6" style="padding-left: 50px;">
+                            <div>
+                                <label>
+                                    <input type="checkbox" id="{{ activity['activity_id'] }}" name="{{ activity['activity_id'] }}" value="1">
+                                    <strong>{{ activity['activity_name'] }}</strong>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-sm-6" style="padding-left: 10px; text-align: left;">
+                            <select id="select_{{ activity['activity_id'] }}" onchange="redirectUser('{{ activity['activity_id'] }}')"> 
+                                <option value="">...</option>
+                                <option value="editar">Editar Actividad</option>
+                                <option value="borrar">Borrar Actividad</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <script>
+                        // Function to save the checkbox state to localStorage
+                        function saveCheckboxState() {
+                            var checkbox = document.getElementById("{{ activity['activity_id'] }}");
+                            localStorage.setItem("{{ activity['activity_id'] }}", checkbox.checked);
+                        }
+                        
+                        // Function to load the checkbox state from localStorage
+                        function loadCheckboxState() {
+                            var checkbox = document.getElementById("{{ activity['activity_id'] }}");
+                            var checkboxState = localStorage.getItem("{{ activity['activity_id'] }}");
+                            
+                            if (checkboxState === "true") {
+                                checkbox.checked = true;
+                            } else {
+                                checkbox.checked = false;
+                            }
+                        }
+                        
+                        // Add event listeners to save and load the checkbox state
+                        var checkbox = document.getElementById("{{ activity['activity_id'] }}");
+                        checkbox.addEventListener("change", saveCheckboxState);
+                        
+                        // Load the checkbox state when the page is loaded
+                        window.addEventListener("load", loadCheckboxState);
+                    </script>
+                    
+                </li>
+                {% endfor %}
             </ul>
-          </div>
+            
+              
+              <script>
+                function redirectUser(activityId) {
+                  var selectElement = document.getElementById("select_" + activityId);
+                  var selectedOption = selectElement.value;
+              
+                  if (selectedOption === "editar") {
+                    window.location.href = "/editActivity/"+activityId;
+                  } else if (selectedOption === "borrar") {
+                    window.location.href = "/deleteActivity/"+activityId;
+                  } 
+                }
+              </script>
+              
+
+                <!-- Place the dropdown outside the loop -->
+                
+                  
+
+<!-- ...remaining code... -->
+
+            </ul>
+        </div>
+        
           
         <div class="col-sm-6">
             <h4>Anuncios: </h4>
             <ul style="list-style-type: none;">
                 {% for announcement in announcements %}
-                <li>
-                  <div>
-                    <h5>{{ announcement['announcement_name'] }}</h5>
+                <li class="mb-2" style="list-style-type: none; padding-right: 40px; border: 1px solid #000; border-radius: 3%;">
+                  <div class="row me-0 mt-3">
+                    <div class="col-sm-9" style="text-align: left; padding-left: 25px;">   
+                        <h6>{{announcement['user_name']}}</h6>      
+                    </div>
+                    <div class="col-sm-3">
+                        <h6>{{announcement['announcement_date']}}</h6>
+                    </div>
+
+                    <h5 style = "padding-left: 25px; text-align: left;">{{ announcement['announcement_name'] }}</h5>
+                    <p style = "padding-left: 25px; text-align: left;">{{announcement['announcement_description']}}</p>
+                    <a href="/projectAnnouncement/{{announcement['announcement_id']}}" style="text-align: right;"><p>Comentarios</p></a>
                   </div>
                 </li>
                 {% endfor %}
               </ul>
         </div>
-        <div class="col-sm-3">
-            <h4>Participantes: </h4>
-            <ul style="list-style-type: none;">
+        <div class="col-sm-3" style="padding-left: 50px;">            
+            <ul class="ms-0" style="padding-right: 40px; border: 1px solid #000; border-radius: 10%;">
+                <h5>Participantes: </h5>
                 {% for participant in participants %}
-                <li>
+                <li style="text-align: left; " >
                   <div>
                     <h5>{{ participant['user_name'] }}</h5>
                   </div>
@@ -138,6 +240,8 @@
     <!-- Include the necessary Bootstrap JavaScript and jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
 </body>
 </html>
 {% endblock %}

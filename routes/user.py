@@ -241,10 +241,11 @@ def project_view(id):
 # Rest of the code
 
             project_announcements= """
-            SELECT * FROM announcement WHERE Project_project_id = %s
+            SELECT announcement.announcement_name, announcement.announcement_id, announcement.announcement_description, announcement.announcement_date, User.uid, user.user_name FROM announcement JOIN user on user.uid = announcement.user_uid WHERE Project_project_id = %s 
               """
             cursor.execute(project_announcements, (id,))
             announcements = [announcement for announcement in cursor.fetchall()]
+            print(announcements)
 
             project_participants = """
             SELECT user.user_name, user_has_project.user_uid FROM user_has_project JOIN user ON user.uid = user_has_project.User_uid WHERE user_has_project.Project_project_id = %s
@@ -276,7 +277,7 @@ def create_activity(id):
     if request.method == "POST":
         activity_title = request.form['tituloActividad']
         activity_insert = """
-        INSERT INTO activity VALUES (NULL, %s, %s)
+        INSERT INTO activity VALUES (NULL, %s, %s, 0)
 """
         cursor.execute(activity_insert, (activity_title, id,))
         test = cursor.fetchall()
@@ -303,11 +304,11 @@ def create_announcement(id):
     if request.method == "POST":
         announcement_title = request.form['tituloAnuncio']
         announcement_description = request.form['descripcionAnuncio']
-        announcement_creation_date = date.today()
+
         announcement_insert = """
-        INSERT INTO announcement VALUES (NULL, %s, %s, %s, %s, %s)
+        INSERT INTO announcement VALUES (NULL, %s, %s, NULL, %s, %s)
 """
-        cursor.execute(announcement_insert, (announcement_title, announcement_description, announcement_creation_date, session['uid'], id))
+        cursor.execute(announcement_insert, (announcement_title, announcement_description, session['uid'], id))
         test = cursor.fetchall()
         mysql.connection.commit()
         return redirect(url_for('user.project_view', id=id))     
@@ -318,6 +319,80 @@ def create_announcement(id):
         else:
              return redirect(url_for("auth.login"))
             
+
+@user_bp.route("/shareCode/<id>", methods=['GET'])
+def share_code(id):
+    mysql = current_app.config['MYSQL']
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    query = """
+            SELECT * FROM project WHERE project_id = %s
+            """
+    cursor.execute(query, (id,))
+    project = cursor.fetchone()
+
+    if request.method == 'GET':
+        if "loggedin" in session:           
+            return render_template("addMember.html", project_id = id,  project = project)
+        else:
+             return redirect(url_for("auth.login"))
+        
+@user_bp.route("/projectAnnouncement/<id>", methods=['GET', 'POST'])
+def announcement(id):
+     if request.method == 'POST':
+         mysql = current_app.config['MYSQL']
+         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+         commentary = request.form['comentario']
+         insert_comment = '''
+         INSERT INTO comment VALUES (NULL, %s, NULL, %s, %s )            
+        ''' 
+         query = """
+                    SELECT announcement.announcement_id, announcement.announcement_name, announcement.announcement_description, announcement.announcement_Date, User.uid, User.user_name, announcement.project_project_id FROM announcement JOIN user ON user.uid = announcement.user_uid WHERE announcement_id = %s
+                    """
+         cursor.execute(query, (id,))
+         announcement = cursor.fetchone()
+        
+         cursor.execute(insert_comment, (commentary, session['uid'], announcement['announcement_id'],))   
+         mysql.connection.commit()
+         comment_query = """
+            SELECT comment.comment_id, comment_content, comment.comment_date, comment.User_uid, user.user_name  FROM comment JOIN user ON user.uid = comment.User_uid WHERE comment.Announcement_announcement_id = %s;
+            """
+         cursor.execute(comment_query, (announcement['announcement_id'],))
+         comments = [comment for comment in cursor.fetchall()]
+         return render_template("announcement.html", announcement = announcement, comments=comments, id=id)
+     elif request.method == 'GET':
+        if "loggedin" in session: 
+            mysql = current_app.config['MYSQL']
+            cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+            query = """
+                    SELECT announcement.announcement_id, announcement.announcement_name, announcement.announcement_description, announcement.announcement_Date, User.uid, User.user_name, announcement.project_project_id FROM announcement JOIN user ON user.uid = announcement.user_uid WHERE announcement_id = %s
+                    """
+            cursor.execute(query, (id,))
+            announcement = cursor.fetchone()
+
+            comment_query = """
+            SELECT comment.comment_id, comment_content, comment.comment_date, comment.User_uid, user.user_name  FROM comment JOIN user ON user.uid = comment.User_uid WHERE comment.Announcement_announcement_id = %s;
+            """
+            cursor.execute(comment_query, (announcement['announcement_id'],))
+            comments = [comment for comment in cursor.fetchall()]
+            print(comments)
+            print(announcement)
+            
+            return render_template("announcement.html", announcement = announcement, comments=comments, id=id)
+        else:
+            return redirect(url_for("auth.login"))
+    
+@user_bp.route("/editActivity/<id>", methods=['GET', 'POST'])
+@user_bp.route("/deleteActivity/<id>", methods=['GET', 'POST'])
+@user_bp.route("/editProject/<id>", methods=['GET', 'POST'])
+@user_bp.route("/deleteProject/<id>", methods=['GET', 'POST'])
+@user_bp.route("/editAnnouncement/<id>", methods=['GET', 'POST'])
+@user_bp.route("/deleteAnnouncement/<id>", methods=['GET', 'POST'])
+@user_bp.route("/editComment/<id>", methods=['GET', 'POST'])
+@user_bp.route("/deleteComment/<id>", methods=['GET', 'POST'])
+@user_bp.route("/leaveProject/<id>", methods=['GET', 'POST'])
+
+
+    
             
         
             

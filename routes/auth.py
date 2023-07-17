@@ -60,8 +60,7 @@ def signup():
         nombre = request.form["nombre"]+" "+request.form["apellido"]
         password = request.form['password']
         confirmarPassword = request.form["confirmarPassword"]
-        fechaCreacion = date.today()
-
+        
         # Check if a user already exists with that email
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         cursor.execute('SELECT * FROM user WHERE email = %s', (email,))
@@ -84,8 +83,8 @@ def signup():
             hash = hashlib.sha1(hash.encode())
             password = hash.hexdigest()
             # Database tuple insertion
-            cursor.execute('INSERT INTO user VALUES (NULL, %s, %s, %s, %s)',
-                           (nombre, email, password, fechaCreacion))
+            cursor.execute('INSERT INTO user VALUES (NULL, %s, %s, %s, NULL)',
+                           (nombre, email, password,))
             mysql.connection.commit()
             msg = 'Usuario registrado exitosamente'
     elif request.method == "POST":
