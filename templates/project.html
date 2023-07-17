@@ -40,8 +40,29 @@
             <h3 class="text-align=left mb-3">{{project['project_title']}}</h3>
             <p class="text-align=left mb-0">"{{project['project_description']}}"</p>
         </row>
-
         
+        <select class="ms-5" id="{{ project['project_id'] }}" onchange="modifyProject('{{ project['project_id'] }}')"> 
+            <option value="">...</option>
+            <option value="editar">Editar Proyecto</option>
+            <option value="borrar">Borrar Proyecto</option>
+        </select>
+
+        <a class="ms-5" href="/leaveProject/{{project['project_id']}}">
+            <button class="btn btn-sm btn-primary" style="background-color: darkred;">Salir del Grupo</button>   
+        </a>    
+
+        <script>
+            function modifyProject(project_id) {
+              var selectElement = document.getElementById("{{ project['project_id'] }}");
+              var selectedOption = selectElement.value;
+          
+              if (selectedOption === "editar") {
+                window.location.href = "/editProject/"+project_id;
+              } else if (selectedOption === "borrar") {
+                window.location.href = "/deleteProject/"+project_id;
+              } 
+            }
+          </script>
         
         <div class="collapse navbar-collapse" id="navbarsExample03">
             <ul class="navbar-nav ml-auto">
@@ -54,8 +75,7 @@
                                         <p>{{project['starting_date']}}</p>
                                         <a href="/createActivity/{{project['project_id']}}">
                                             <button class="btn btn-sm btn-primary" style="background-color: darkgreen;">Añadir Actividad</button>   
-                                        </a>
-                                    
+                                        </a>     
                                 </div>
                             </li>
                         </div>
@@ -96,29 +116,46 @@
     
     </nav>
     <div class="line"></div>
-    
 
     <div class="row me-0 mt-3">
         <div class="col-sm-3" style="padding-left: 50px;">            
             <ul class="ms-0" style="list-style-type: none; padding-right: 40px; border: 1px solid #000; border-radius: 10%;">
                 <h5>Actividades del Proyecto:</h5>
+             <!-- ...previous code... -->
+
+             <ul style="list-style-type: none;">
                 {% for activity in activities %}
+                
                 <li>
-                    <div>
-                        <input type="checkbox" id="activity{{activity['activity_id']}}" name="activity{{activity['activity_id']}}" value="1">
-                        <strong><label for="activity{{activity['activity_id']}}"> {{ activity['activity_name'] }}</label></strong>
+                    <div class="row me-0 mt-3 mb-3">
+                        <div class="col-sm-6" style="padding-left: 50px;">
+                            <div>
+                                <label>
+                                    <input type="checkbox" id="{{ activity['activity_id'] }}" name="{{ activity['activity_id'] }}" value="1">
+                                    <strong>{{ activity['activity_name'] }}</strong>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-sm-6" style="padding-left: 10px; text-align: left;">
+                            <select id="select_{{ activity['activity_id'] }}" onchange="redirectUser('{{ activity['activity_id'] }}')"> 
+                                <option value="">...</option>
+                                <option value="editar">Editar Actividad</option>
+                                <option value="borrar">Borrar Actividad</option>
+                            </select>
+                        </div>
                     </div>
+
                     <script>
                         // Function to save the checkbox state to localStorage
                         function saveCheckboxState() {
-                            var checkbox = document.getElementById("activity{{activity['activity_id']}}");
-                            localStorage.setItem("activity{{activity['activity_id']}}", checkbox.checked);
+                            var checkbox = document.getElementById("{{ activity['activity_id'] }}");
+                            localStorage.setItem("{{ activity['activity_id'] }}", checkbox.checked);
                         }
                         
                         // Function to load the checkbox state from localStorage
                         function loadCheckboxState() {
-                            var checkbox = document.getElementById("activity{{activity['activity_id']}}");
-                            var checkboxState = localStorage.getItem("activity{{activity['activity_id']}}");
+                            var checkbox = document.getElementById("{{ activity['activity_id'] }}");
+                            var checkboxState = localStorage.getItem("{{ activity['activity_id'] }}");
                             
                             if (checkboxState === "true") {
                                 checkbox.checked = true;
@@ -128,14 +165,38 @@
                         }
                         
                         // Add event listeners to save and load the checkbox state
-                        var checkbox = document.getElementById("activity{{activity['activity_id']}}");
+                        var checkbox = document.getElementById("{{ activity['activity_id'] }}");
                         checkbox.addEventListener("change", saveCheckboxState);
                         
                         // Load the checkbox state when the page is loaded
                         window.addEventListener("load", loadCheckboxState);
                     </script>
+                    
                 </li>
                 {% endfor %}
+            </ul>
+            
+              
+              <script>
+                function redirectUser(activityId) {
+                  var selectElement = document.getElementById("select_" + activityId);
+                  var selectedOption = selectElement.value;
+              
+                  if (selectedOption === "editar") {
+                    window.location.href = "/editActivity/"+activityId;
+                  } else if (selectedOption === "borrar") {
+                    window.location.href = "/deleteActivity/"+activityId;
+                  } 
+                }
+              </script>
+              
+
+                <!-- Place the dropdown outside the loop -->
+                
+                  
+
+<!-- ...remaining code... -->
+
             </ul>
         </div>
         

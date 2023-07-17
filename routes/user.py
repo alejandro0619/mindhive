@@ -277,7 +277,7 @@ def create_activity(id):
     if request.method == "POST":
         activity_title = request.form['tituloActividad']
         activity_insert = """
-        INSERT INTO activity VALUES (NULL, %s, %s)
+        INSERT INTO activity VALUES (NULL, %s, %s, 0)
 """
         cursor.execute(activity_insert, (activity_title, id,))
         test = cursor.fetchall()
@@ -304,11 +304,11 @@ def create_announcement(id):
     if request.method == "POST":
         announcement_title = request.form['tituloAnuncio']
         announcement_description = request.form['descripcionAnuncio']
-        announcement_creation_date = date.today()
+
         announcement_insert = """
-        INSERT INTO announcement VALUES (NULL, %s, %s, %s, %s, %s)
+        INSERT INTO announcement VALUES (NULL, %s, %s, NULL, %s, %s)
 """
-        cursor.execute(announcement_insert, (announcement_title, announcement_description, announcement_creation_date, session['uid'], id))
+        cursor.execute(announcement_insert, (announcement_title, announcement_description, session['uid'], id))
         test = cursor.fetchall()
         mysql.connection.commit()
         return redirect(url_for('user.project_view', id=id))     
@@ -342,9 +342,8 @@ def announcement(id):
          mysql = current_app.config['MYSQL']
          cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
          commentary = request.form['comentario']
-         commentary_date = date.today()
          insert_comment = '''
-         INSERT INTO comment VALUES (NULL, %s, %s, %s, %s )            
+         INSERT INTO comment VALUES (NULL, %s, NULL, %s, %s )            
         ''' 
          query = """
                     SELECT announcement.announcement_id, announcement.announcement_name, announcement.announcement_description, announcement.announcement_Date, User.uid, User.user_name, announcement.project_project_id FROM announcement JOIN user ON user.uid = announcement.user_uid WHERE announcement_id = %s
@@ -352,7 +351,7 @@ def announcement(id):
          cursor.execute(query, (id,))
          announcement = cursor.fetchone()
         
-         cursor.execute(insert_comment, (commentary, commentary_date, session['uid'], announcement['announcement_id'],))   
+         cursor.execute(insert_comment, (commentary, session['uid'], announcement['announcement_id'],))   
          mysql.connection.commit()
          comment_query = """
             SELECT comment.comment_id, comment_content, comment.comment_date, comment.User_uid, user.user_name  FROM comment JOIN user ON user.uid = comment.User_uid WHERE comment.Announcement_announcement_id = %s;
@@ -382,6 +381,16 @@ def announcement(id):
         else:
             return redirect(url_for("auth.login"))
     
+@user_bp.route("/editActivity/<id>", methods=['GET', 'POST'])
+@user_bp.route("/deleteActivity/<id>", methods=['GET', 'POST'])
+@user_bp.route("/editProject/<id>", methods=['GET', 'POST'])
+@user_bp.route("/deleteProject/<id>", methods=['GET', 'POST'])
+@user_bp.route("/editAnnouncement/<id>", methods=['GET', 'POST'])
+@user_bp.route("/deleteAnnouncement/<id>", methods=['GET', 'POST'])
+@user_bp.route("/editComment/<id>", methods=['GET', 'POST'])
+@user_bp.route("/deleteComment/<id>", methods=['GET', 'POST'])
+@user_bp.route("/leaveProject/<id>", methods=['GET', 'POST'])
+
 
     
             

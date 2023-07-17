@@ -40,7 +40,34 @@
             <div class="line"></div>
             <div class="row me-3 mt-3 ms-3" style="list-style-type: none; padding-right: 40px; border: 1px solid #000; border-radius: 1%;">
                 <div class="col-sm-9 mt-3" style="text-align: left; padding-left: 25px;">   
-                    <h4>{{announcement['user_name']}}</h4>      
+                    
+                    <div class="row">
+                        <div class="col-sm-6 ">
+                            <h4>{{announcement['user_name']}}</h4> 
+                        </div>
+                        <div class="col-sm-6 ">
+                            <select class="me-3" id="{{ announcement['announcement_id'] }}" onchange="modifyAnnouncement('{{ announcement['announcement_id'] }}')"> 
+                                <option value="">...</option>
+                                <option value="editar">Editar Anuncio</option>
+                                <option value="borrar">Borrar Anuncio</option>
+                            </select>
+                        </div>
+                    </div>
+                   
+
+                    <script>
+                        function modifyAnnouncement(announcementId) {
+                          var selectElement = document.getElementById("{{ announcement['announcement_id'] }}");
+                          var selectedOption = selectElement.value;
+                      
+                          if (selectedOption === "editar") {
+                            window.location.href = "/editAnnouncement/"+announcementId;
+                          } else if (selectedOption === "borrar") {
+                            window.location.href = "/deleteAnnouncement/"+announcementId;
+                          } 
+                        }
+                      </script>
+
                 </div>
                 <div class="col-sm-3 mt-3">
                     <h5>{{announcement['announcement_Date']}}</h5>
@@ -53,16 +80,42 @@
 
             <div class="row me-3 mt-3 ms-3">
                 <div class="col-sm-6" style="text-align: left; padding-left: 25px;">   
-                    <ul> 
+                    <ul style="list-style-type: none;"> 
                     {% for comment in comments %}
                         <li class="mb-3" style="list-style-type: none; padding-right: 40px; border: 1px solid #000; border-radius: 5%;">
-                            <h4 style="padding-left: 25px;">{{ comment.user_name }}</h4>
+                            <div class="row">
+                                <div class="col-sm-6 ">
+                                    <h4 style="padding-left: 25px;">{{ comment['user_name']}}</h4> 
+                                </div>
+                                <div class="col-sm-6 ">
+                                    <select class="me-3 mt-3" id="select_{{comment['comment_id']}}" onchange="modifyComment('{{ comment['comment_id']}}')"> 
+                                        <option value="">...</option>
+                                        <option value="editar">Editar Comentario</option>
+                                        <option value="borrar">Borrar Comentario</option>
+                                    </select>
+                                </div>
+                            </div>
+                           
+        
+                            
                             <h5 style="padding-left: 25px;">{{ comment.comment_content }}</h5>
                             <h5 style="text-align: right;">{{ comment.comment_date }}</h5>
                         </li>
                         
                     {% endfor %}
                     </ul>
+                    <script>
+                        function modifyComment(commentId) {
+                          var selectElement = document.getElementById("select_" + commentId);
+                          var selectedOption = selectElement.value;
+                      
+                          if (selectedOption === "editar") {
+                            window.location.href = "/editComment/"+commentId;
+                          } else if (selectedOption === "borrar") {
+                            window.location.href = "/deleteComment/"+commentId;
+                          } 
+                        }
+                      </script>
                 </div>
                 
                 <div class="col-sm-6" style="text-align: left; padding-left: 25px;">   
