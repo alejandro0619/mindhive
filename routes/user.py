@@ -381,15 +381,15 @@ def announcement(id):
         else:
             return redirect(url_for("auth.login"))
     
-@user_bp.route("/editActivity/<id>", methods=['GET', 'POST'])
-@user_bp.route("/deleteActivity/<id>", methods=['GET', 'POST'])
-@user_bp.route("/editProject/<id>", methods=['GET', 'POST'])
-@user_bp.route("/deleteProject/<id>", methods=['GET', 'POST'])
-@user_bp.route("/editAnnouncement/<id>", methods=['GET', 'POST'])
-@user_bp.route("/deleteAnnouncement/<id>", methods=['GET', 'POST'])
-@user_bp.route("/editComment/<id>", methods=['GET', 'POST'])
-@user_bp.route("/deleteComment/<id>", methods=['GET', 'POST'])
-@user_bp.route("/leaveProject/<id>", methods=['GET', 'POST'])
+# @user_bp.route("/editActivity/<id>", methods=['GET', 'POST'])
+# @user_bp.route("/deleteActivity/<id>", methods=['GET', 'POST'])
+# @user_bp.route("/editProject/<id>", methods=['GET', 'POST'])
+# @user_bp.route("/deleteProject/<id>", methods=['GET', 'POST'])
+# @user_bp.route("/editAnnouncement/<id>", methods=['GET', 'POST'])
+# @user_bp.route("/deleteAnnouncement/<id>", methods=['GET', 'POST'])
+# @user_bp.route("/editComment/<id>", methods=['GET', 'POST'])
+# @user_bp.route("/deleteComment/<id>", methods=['GET', 'POST'])
+# @user_bp.route("/leaveProject/<id>", methods=['GET', 'POST'])
 
 
     
