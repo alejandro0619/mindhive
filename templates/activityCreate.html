@@ -35,7 +35,7 @@
     </nav>
     
 
-    <form action="/createActivity/{{project['project_id']}}" method="POST">
+    <form action="/{{route}}/{{project['project_id']}}{{activity_id}}" method="POST">
 
         <h1 class="text-align: left mt-3 mb-3 ms-4" style = "text-align: left;">Creación de Actividad</h1>
         <div class="line"></div>
@@ -48,7 +48,7 @@
             <h3 class="ms-5 mt-5"  style="text-align: left;">Descripción de la Actividad:</h3>
             <div class="col-sm-8 ms-5">
                     <div class="form-floating mt-2">
-                        <input type="text" class="form-control" id="tituloActividad" name="tituloActividad" placeholder="tituloActividad">
+                        <input type="text" class="form-control" id="tituloActividad" name="tituloActividad" placeholder="{{ activity_name}}">
                     </div>
             </div>
 

@@ -238,10 +238,10 @@ def project_view(id):
             activities = [activity for activity in cursor.fetchall()]
             print(activities)  # Add this line to check the contents of activities
 
-# Rest of the code
+        # Rest of the code
 
             project_announcements= """
-            SELECT announcement.announcement_name, announcement.announcement_id, announcement.announcement_description, announcement.announcement_date, User.uid, user.user_name FROM announcement JOIN user on user.uid = announcement.user_uid WHERE Project_project_id = %s 
+            SELECT announcement.announcement_name, announcement.announcement_id, announcement.announcement_description, announcement.announcement_date, user.uid, user.user_name FROM announcement JOIN user on user.uid = announcement.user_uid WHERE Project_project_id = %s 
               """
             cursor.execute(project_announcements, (id,))
             announcements = [announcement for announcement in cursor.fetchall()]
@@ -264,7 +264,7 @@ def project_view(id):
 def project_chat(project_id):
     return render_template("groupChat.html")
 
-@user_bp.route("/createActivity/<id>", methods=['GET', 'POST'])
+@user_bp.route("/activity/<id>", methods=['GET', 'POST'])
 def create_activity(id):
     mysql = current_app.config['MYSQL']
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
@@ -278,18 +278,51 @@ def create_activity(id):
         activity_title = request.form['tituloActividad']
         activity_insert = """
         INSERT INTO activity VALUES (NULL, %s, %s, 0)
-"""
+        """
         cursor.execute(activity_insert, (activity_title, id,))
-        test = cursor.fetchall()
+
         mysql.connection.commit()
         return redirect(url_for('user.project_view', id=id))     
 
     elif request.method == 'GET':
         if "loggedin" in session:
-            return render_template("activityCreate.html", project_id = id,  project = project)
+            return render_template("activityCreate.html", route = "activity", project_id = id,  project = project, activity_name = "Nombre de la actividad", activity_id = '')
         else:
              return redirect(url_for("auth.login"))
     
+@user_bp.route("/editActivity/<project_id>/<id>", methods=['GET','POST'])
+def edit_activity(project_id, id):
+    mysql = current_app.config['MYSQL']
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+
+    mysql = current_app.config['MYSQL']
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    query = """
+            SELECT * FROM project WHERE project_id = %s
+            """
+    cursor.execute(query, (project_id,))
+    project = cursor.fetchone()
+
+    if request.method == "POST":
+        activity_title = request.form['tituloActividad']
+        activity_update = """
+        UPDATE activity
+        SET activity_name = %s
+        WHERE activity_id = %s
+        """
+        cursor.execute(activity_update, (activity_title, id,))
+
+        mysql.connection.commit()
+        return redirect(url_for('user.project_view', id = project_id)) 
+
+    elif request.method == "GET":
+        if "loggedin" in session:
+            query_retrieve_activity_title = "SELECT activity_name FROM activity WHERE activity_id = %s"
+            cursor.execute(query_retrieve_activity_title, (id, ))
+            activity = cursor.fetchone()
+            return render_template("activityCreate.html", route = "editActivity", project_id =  project_id,  project = project, activity_name =  activity['activity_name'], activity_id = '/' + id)
+    else:
+        return redirect(url_for('auth.login'))
 
 @user_bp.route("/createAnnouncement/<id>", methods=['GET', 'POST'])
 def create_announcement(id):
@@ -339,26 +372,27 @@ def share_code(id):
 @user_bp.route("/projectAnnouncement/<id>", methods=['GET', 'POST'])
 def announcement(id):
      if request.method == 'POST':
-         mysql = current_app.config['MYSQL']
-         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-         commentary = request.form['comentario']
-         insert_comment = '''
+        mysql = current_app.config['MYSQL']
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        commentary = request.form['comentario']
+        insert_comment = '''
          INSERT INTO comment VALUES (NULL, %s, NULL, %s, %s )            
         ''' 
-         query = """
+        query = """
                     SELECT announcement.announcement_id, announcement.announcement_name, announcement.announcement_description, announcement.announcement_Date, User.uid, User.user_name, announcement.project_project_id FROM announcement JOIN user ON user.uid = announcement.user_uid WHERE announcement_id = %s
                     """
-         cursor.execute(query, (id,))
-         announcement = cursor.fetchone()
+        cursor.execute(query, (id,))
+        announcement = cursor.fetchone()
         
-         cursor.execute(insert_comment, (commentary, session['uid'], announcement['announcement_id'],))   
-         mysql.connection.commit()
-         comment_query = """
+        cursor.execute(insert_comment, (commentary, session['uid'], announcement['announcement_id'],))   
+        mysql.connection.commit()
+        comment_query = """
             SELECT comment.comment_id, comment_content, comment.comment_date, comment.User_uid, user.user_name  FROM comment JOIN user ON user.uid = comment.User_uid WHERE comment.Announcement_announcement_id = %s;
             """
-         cursor.execute(comment_query, (announcement['announcement_id'],))
-         comments = [comment for comment in cursor.fetchall()]
-         return render_template("announcement.html", announcement = announcement, comments=comments, id=id)
+        cursor.execute(comment_query, (announcement['announcement_id'],))
+        comments = [comment for comment in cursor.fetchall()]
+        return render_template("announcement.html", announcement = announcement, comments=comments, id=id)
+
      elif request.method == 'GET':
         if "loggedin" in session: 
             mysql = current_app.config['MYSQL']
@@ -380,20 +414,4 @@ def announcement(id):
             return render_template("announcement.html", announcement = announcement, comments=comments, id=id)
         else:
             return redirect(url_for("auth.login"))
-    
-# @user_bp.route("/editActivity/<id>", methods=['GET', 'POST'])
-# @user_bp.route("/deleteActivity/<id>", methods=['GET', 'POST'])
-# @user_bp.route("/editProject/<id>", methods=['GET', 'POST'])
-# @user_bp.route("/deleteProject/<id>", methods=['GET', 'POST'])
-# @user_bp.route("/editAnnouncement/<id>", methods=['GET', 'POST'])
-# @user_bp.route("/deleteAnnouncement/<id>", methods=['GET', 'POST'])
-# @user_bp.route("/editComment/<id>", methods=['GET', 'POST'])
-# @user_bp.route("/deleteComment/<id>", methods=['GET', 'POST'])
-# @user_bp.route("/leaveProject/<id>", methods=['GET', 'POST'])
-
-
-    
-            
-        
-            
-    
+            return redirect(url_for("auth.login"))

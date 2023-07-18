@@ -83,7 +83,7 @@ def signup():
             hash = hashlib.sha1(hash.encode())
             password = hash.hexdigest()
             # Database tuple insertion
-            cursor.execute('INSERT INTO user VALUES (NULL, %s, %s, %s, NULL)',
+            cursor.execute('INSERT INTO user VALUES (NULL, %s, %s, %s, DEFAULT)',
                            (nombre, email, password,))
             mysql.connection.commit()
             msg = 'Usuario registrado exitosamente'
