@@ -126,14 +126,12 @@ def profile_view():
 @user_bp.route("/createProject", methods=['GET', 'POST'])
 def create_project_view():
     mysql = current_app.config['MYSQL']
-    
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     if request.method == "POST":
         # Query that gathers the shareable codes from all the projects
         get_shareable_code_query = """
         SELECT shareable_code from project
         """
-
-        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         cursor.execute(get_shareable_code_query)
         # We turn the array of dicts into a array of just the shareable codes
         codes = [code['shareable_code'] for code in cursor.fetchall()]
@@ -173,9 +171,45 @@ def create_project_view():
         return redirect(url_for("user.dashboard", by=1))
     elif request.method == "GET":
         if 'loggedin' in session: 
-            return render_template("projectCreate.html")
+            return render_template("projectCreate.html", route = "createProject", project_id  = "", title_label = "Creación", button_label = 'Crear proyecto')
         else: 
             return redirect(url_for("auth.login"))
+
+@user_bp.route("/editProject/<id>", methods=['GET', 'POST'])
+def edit_project(id):
+    mysql = current_app.config['MYSQL']
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+
+    if request.method == 'POST':
+        if 'loggedin' in session:
+            project_title = request.form['tituloProyecto']
+            project_description = request.form["descripcionProyecto"]
+            starting_date = datetime.strptime(request.form['fechaInicioProyecto'], "%Y-%m-%d")
+            ending_date = datetime.strptime(request.form["fechaCierreProyecto"], "%Y-%m-%d")
+
+            query = """
+            UPDATE project
+            SET project_title = %s,
+                project_description = %s,
+                starting_date = %s,
+                ending_date = %s
+            WHERE project_id = %s
+            """
+            cursor.execute(query, (project_title, project_description, starting_date, ending_date, id))
+            mysql.connection.commit()
+            return redirect(url_for('user.root'))
+
+    elif request.method == 'GET':
+        uid = session['uid']
+        query = "SELECT User_project_creator from project where project_id = %s"
+        cursor.execute(query, (id, ))
+        project_creator_id = cursor.fetchone()
+
+        if (str(project_creator_id['User_project_creator']) == str(uid)):
+            return render_template("projectCreate.html", route = "editProject", project_id = '/' + id, title_label = "Edición", button_label = 'Editar proyecto')
+        else:
+            return redirect(url_for('user.root'))
+        
 
 @user_bp.route('/adduser', methods=['POST'])
 def add_member():
@@ -252,9 +286,9 @@ def project_view(id):
               """
             cursor.execute(project_participants, (id,))
             participants = [user_has_project for user_has_project in cursor.fetchall()]
-            print(activities)
-            print(announcements)
-            print(participants)
+            # print(activities)
+            # print(announcements)
+            # print(participants)
 
             return render_template("project.html", project_id = id, project = project, activities = activities, announcements = announcements, participants=participants)
         else:
@@ -294,9 +328,6 @@ def create_activity(id):
 def edit_activity(project_id, id):
     mysql = current_app.config['MYSQL']
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-
-    mysql = current_app.config['MYSQL']
-    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     query = """
             SELECT * FROM project WHERE project_id = %s
             """
@@ -313,6 +344,7 @@ def edit_activity(project_id, id):
         cursor.execute(activity_update, (activity_title, id,))
 
         mysql.connection.commit()
+
         return redirect(url_for('user.project_view', id = project_id)) 
 
     elif request.method == "GET":
@@ -321,7 +353,7 @@ def edit_activity(project_id, id):
             cursor.execute(query_retrieve_activity_title, (id, ))
             activity = cursor.fetchone()
             return render_template("activityCreate.html", route = "editActivity", project_id =  project_id,  project = project, activity_name =  activity['activity_name'], activity_id = '/' + id)
-    else:
+    else: 
         return redirect(url_for('auth.login'))
 
 @user_bp.route("/createAnnouncement/<id>", methods=['GET', 'POST'])
