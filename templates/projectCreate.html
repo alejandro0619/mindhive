@@ -33,11 +33,11 @@
         </div>
     </nav>
 
-    <form action="/createProject" method="POST">
+    <form action="/{{route}}{{project_id}}" method="POST">
 
        
             <div class="mt-4 ms-4" style="text-align: left; ">
-                <h1>Creación de un nuevo projecto en Mind<strong>Hive</strong></h1>
+                <h1>{{title_label}} de un proyecto en Mind<strong>Hive</strong></h1>
             </div>  
             
             <h3 class="ms-5 mt-5"  style="text-align: left;">Titulo del proyecto:</h3>
@@ -71,7 +71,7 @@
             </div>
 
             <div class="ms-5 mt-5 mb-5" style="text-align:left;">
-                <button class="w-50 btn btn-lg btn-primary" style="background-color: darkgreen;" type="submit">Crear Proyecto</button>
+                <button class="w-50 btn btn-lg btn-primary" style="background-color: darkgreen;" type="submit">{{button_label}}</button>
             </div>
             
             

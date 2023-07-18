@@ -95,10 +95,8 @@
                         <div class="col-sm-4">
                             <li>
                                 <div>
-                                    <button class="btn btn-sm btn-primary mt-3 "  style="background-color: rgb(0, 0, 0);">Chat Grupal</button>
-
                                     <a href="/shareCode/{{project['project_id']}}">
-                                        <button class="btn btn-sm btn-primary mt-3"  style="background-color: darkgreen;">Añadir Miembros</button>  
+                                        <button class="btn btn-sm btn-primary mt-5"  style="background-color: darkgreen;">Añadir Miembros</button>  
                                     </a>
                                    
                                 </div>
@@ -128,10 +126,9 @@
                 
                 <li>
                     <div class="row me-0 mt-3 mb-3">
-                        <div class="col-sm-6" style="padding-left: 50px;">
+                        <div class="col-sm-6" style="pvscode-file://vscode-app/opt/visual-studio-code/resources/app/out/vs/code/electron-sandbox/workbench/workbench.htmladding-left: 50px;">
                             <div>
                                 <label>
-                                    <input type="checkbox" id="{{ activity['activity_id'] }}" name="{{ activity['activity_id'] }}" value="1">
                                     <strong>{{ activity['activity_name'] }}</strong>
                                 </label>
                             </div>
@@ -140,7 +137,7 @@
                             <select id="select_{{ activity['activity_id'] }}" onchange="redirectUser('{{ activity['activity_id'] }}', '{{project['project_id']}}')"> 
                                 <option value="">...</option>
                                 <option value="editar">Editar Actividad</option>
-                                <option value="borrar">Borrar Actividad</option>
+                                <option value="borrar">Marcar como completado</option>
                             </select>
                         </div>
                     </div>
