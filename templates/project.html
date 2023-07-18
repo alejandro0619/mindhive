@@ -73,7 +73,7 @@
                                 <div>
                                     <p class="mb-0"><strong>Fecha Inicio</strong></p>
                                         <p>{{project['starting_date']}}</p>
-                                        <a href="/createActivity/{{project['project_id']}}">
+                                        <a href="/activity/{{project['project_id']}}">
                                             <button class="btn btn-sm btn-primary" style="background-color: darkgreen;">Añadir Actividad</button>   
                                         </a>     
                                 </div>
@@ -137,7 +137,7 @@
                             </div>
                         </div>
                         <div class="col-sm-6" style="padding-left: 10px; text-align: left;">
-                            <select id="select_{{ activity['activity_id'] }}" onchange="redirectUser('{{ activity['activity_id'] }}')"> 
+                            <select id="select_{{ activity['activity_id'] }}" onchange="redirectUser('{{ activity['activity_id'] }}', '{{project['project_id']}}')"> 
                                 <option value="">...</option>
                                 <option value="editar">Editar Actividad</option>
                                 <option value="borrar">Borrar Actividad</option>
@@ -178,12 +178,12 @@
             
               
               <script>
-                function redirectUser(activityId) {
+                function redirectUser(activityId, projectId) {
                   var selectElement = document.getElementById("select_" + activityId);
                   var selectedOption = selectElement.value;
               
                   if (selectedOption === "editar") {
-                    window.location.href = "/editActivity/"+activityId;
+                    window.location.href = "/editActivity/" + projectId + '/' + activityId;
                   } else if (selectedOption === "borrar") {
                     window.location.href = "/deleteActivity/"+activityId;
                   } 
