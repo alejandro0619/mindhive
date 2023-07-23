@@ -35,23 +35,23 @@
     <h3><strong>Edición de perfil</strong></h3>
     <h5>Edita los campos de tu perfil que deseas modificar</h5>
     <div class="form-floating">
-        <input type="email" class="form-control" id="email" name="email" placeholder="email" value="{{ session['email'] }}">
+        <input type="email" class="form-control" maxlength="45" id="email" name="email" placeholder="email" value="{{ session['email'] }}">
         <label for="email">E-mail</label>
     </div>
     <div class="form-floating mt-2">
-        <input type="text" class="form-control" id="nombre" name="nombre" placeholder="nombre" value="{{ session['user_name']}}">
+        <input type="text" class="form-control" id="nombre" maxlength="45" name="nombre" placeholder="nombre" value="{{ session['user_name']}}">
         <label for="nombre">Nombre</label>
     </div>
     <div class="form-floating mt-2">
-        <input type="password" class="form-control" id="password" name="password" placeholder="Password">
+        <input type="password" class="form-control" id="password" maxlength="255" name="password" placeholder="Password">
         <label for="password">Contraseña Actual</label>
     </div>
     <div class="form-floating mt-2">
-        <input type="password" class="form-control" id="newPassword" name="newPassword" placeholder="newPassword">
+        <input type="password" class="form-control" id="newPassword" maxlengsth="255" name="newPassword" placeholder="newPassword">
         <label for="password">Contraseña Nueva</label>
     </div>
     <div class="form-floating mt-2">
-        <input type="password" class="form-control" id="confirmarNewPassword" name="confirmarNewPassword" placeholder="confirmarNewPassword">
+        <input type="password" class="form-control" id="confirmarNewPassword" maxlength="255" name="confirmarNewPassword" placeholder="confirmarNewPassword">
         <label for="password">Confirmar Contraseña Nueva</label>
     </div>
     <div class="msg">{{ msg }}</div>

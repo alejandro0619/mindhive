@@ -42,6 +42,7 @@ def dashboard():
                 cursor.execute(count_query, (project_id,))
                 participant_count = cursor.fetchone()['participant_count']
                 project['participant_count'] = participant_count
+            print(projects)
             return render_template("projectList.html", projects=projects, filter = filters_labels[filter_type - 1], msg = project_joining_message)
 
         else:
@@ -423,6 +424,7 @@ def announcement(id):
             """
         cursor.execute(comment_query, (announcement['announcement_id'],))
         comments = [comment for comment in cursor.fetchall()]
+    
         return render_template("announcement.html", announcement = announcement, comments=comments, id=id)
 
      elif request.method == 'GET':
