@@ -21,7 +21,7 @@
             <ul class="navbar-nav ml-auto">
                 <li>
                     <!-- Notification icon -->
-                    <img src="{{ url_for('static', filename='img/notification.png') }}" alt="" width="30" height="30"/>
+                    <img src="{{ url_for('static', filename='img/notification.png') }}" alt="" width="30" height="30" onclick="handleNotificationClick()"/>
                 </li> 
                 <li class="nav-item dropdown">
                     <!-- User dropdown menu -->
@@ -143,10 +143,32 @@
             {% endfor %}
         </ul>
     </div>
-
+    
     <!-- Include the necessary Bootstrap JavaScript and jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.1/socket.io.js" integrity="sha512-Z6C1p1NIexPj5MsVUunW4pg7uMX6/TT3CUVldmjXx2kpip1eZcrAnxIusDxyFIikyM9A61zOVNgvLr/TGudOQg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script type="text/javascript">
+         var socket = io('localhost:5000/',{
+            'reconnection': true,
+            'reconnectionDelay': 500,
+        })
+        socket.on('connect', function() {
+          console.log('Connected to the server');
+        });
+        socket.on('show_notification', function(data) {
+                console.log('Received notification:', data);
+                // Display notification using your preferred method (e.g. Bootstrap alert)
+            });
+        function handleNotificationClick() {
+            // Handle the click event here
+            console.log("yessss")
+            socket.emit('show_notification', 'requesting')
+        }
+       
+        
+        
+      </script>
 </body>
 </html>
 {% endblock %}

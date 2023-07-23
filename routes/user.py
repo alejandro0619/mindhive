@@ -4,16 +4,18 @@ import MySQLdb.cursors
 from datetime import date, datetime
 import re
 import hashlib
-
+from flask_socketio import emit, SocketIO
 from lib.shareable_code import gen_shareable_code
 from lib.query_dispatcher import dispatcher
 
 user_bp = Blueprint("user", __name__)
+messages = []
 
+# Set the websocket for notification handling
 @user_bp.route('/')
 def root():
     return redirect(url_for("user.dashboard", by = 1))
-
+    
 @user_bp.route("/dashboard/filter", methods=['GET', 'POST'])
 def dashboard():
     # We import the current instance of mysql and create a cursor instance
@@ -210,6 +212,30 @@ def edit_project(id):
         else:
             return redirect(url_for('user.root'))
         
+@user_bp.route("/leaveProject/<id>", methods=['POST'])
+def leave_project(id):
+    socket = current_app.config['WS']
+    mysql = current_app.config['MYSQL']
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    uid = session['uid']
+    # check if the user is not the creator of the project
+    query_check_user = "SELECT User_project_creator FROM project WHERE project_id = %s"
+    cursor.execute(query_check_user, (id,))
+    creator = cursor.fetchone()
+
+    if creator['User_project_creator'] != uid:
+        query = "DELETE FROM user_has_project WHERE User_uid = %s"
+        cursor.execute(query, (uid,))
+        mysql.connection.commit()
+        
+
+        messages.append("Se ha salido del proyecto exitosamente")
+        return redirect(url_for("user.root"))
+    else:
+        # socket.emit('show_notification', "Eres el creador del proyecto, no puedes salir.")
+        messages.append("Eres el creador del proyecto, no puedes salir")
+        return redirect(url_for("user.root"))
+    
 
 @user_bp.route('/adduser', methods=['POST'])
 def add_member():
@@ -270,7 +296,6 @@ def project_view(id):
               """
             cursor.execute(project_activities, (id,))
             activities = [activity for activity in cursor.fetchall()]
-            print(activities)  # Add this line to check the contents of activities
 
         # Rest of the code
 
@@ -279,7 +304,6 @@ def project_view(id):
               """
             cursor.execute(project_announcements, (id,))
             announcements = [announcement for announcement in cursor.fetchall()]
-            print(announcements)
 
             project_participants = """
             SELECT user.user_name, user_has_project.user_uid FROM user_has_project JOIN user ON user.uid = user_has_project.User_uid WHERE user_has_project.Project_project_id = %s
@@ -372,7 +396,7 @@ def create_announcement(id):
 
         announcement_insert = """
         INSERT INTO announcement VALUES (NULL, %s, %s, NULL, %s, %s)
-"""
+        """
         cursor.execute(announcement_insert, (announcement_title, announcement_description, session['uid'], id))
         test = cursor.fetchall()
         mysql.connection.commit()
@@ -412,7 +436,7 @@ def announcement(id):
         ''' 
         query = """
                     SELECT announcement.announcement_id, announcement.announcement_name, announcement.announcement_description, announcement.announcement_Date, User.uid, User.user_name, announcement.project_project_id FROM announcement JOIN user ON user.uid = announcement.user_uid WHERE announcement_id = %s
-                    """
+                """
         cursor.execute(query, (id,))
         announcement = cursor.fetchone()
         
@@ -440,8 +464,7 @@ def announcement(id):
             """
             cursor.execute(comment_query, (announcement['announcement_id'],))
             comments = [comment for comment in cursor.fetchall()]
-            print(comments)
-            print(announcement)
+
             
             return render_template("announcement.html", announcement = announcement, comments=comments, id=id)
         else:
