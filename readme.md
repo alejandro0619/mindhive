@@ -7,11 +7,11 @@
 
 ### Projects management
 
-[] Edit
+[X] Edit
 
 [] Delete
 
-[] Leave 
+[X] Leave 
 
 ### Activities management
 
