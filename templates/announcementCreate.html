@@ -17,10 +17,7 @@
 
         <div class="collapse navbar-collapse" id="navbarsExample03">
             <ul class="navbar-nav ml-auto">
-                <li>
-                    <!-- Notification icon -->
-                    <img src="{{ url_for('static', filename='img/notification.png') }}" alt="" width="30" height="30"/>
-                </li>
+               
                 <li class="nav-item dropdown">
                     <!-- User dropdown menu -->
                     <a class="nav-link dropdown-toggle" href="http://example.com" id="dropdown03" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ session["user_name"] }}</a>
@@ -46,7 +43,7 @@
             <h3 class="ms-5 mt-5"  style="text-align: left;">Titulo del anuncio:</h3>
             <div class="col-sm-8 ms-5">
                     <div class="form-floating mt-2">
-                        <input type="text" class="form-control" id="tituloAnuncio" name="tituloAnuncio" placeholder="tituloAnuncio">
+                        <input type="text" maxlength="45" class="form-control" id="tituloAnuncio" name="tituloAnuncio" placeholder="tituloAnuncio">
                     </div>
             </div>
 

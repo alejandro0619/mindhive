@@ -17,10 +17,7 @@
 
         <div class="collapse navbar-collapse" id="navbarsExample03">
             <ul class="navbar-nav ml-auto">
-                <li>
-                    <!-- Notification icon -->
-                    <img src="{{ url_for('static', filename='img/notification.png') }}" alt="" width="30" height="30"/>
-                </li>
+                
                 <li class="nav-item dropdown">
                     <!-- User dropdown menu -->
                     <a class="nav-link dropdown-toggle" href="http://example.com" id="dropdown03" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ session["user_name"] }}</a>
@@ -43,14 +40,14 @@
             <h3 class="ms-5 mt-5"  style="text-align: left;">Titulo del proyecto:</h3>
             <div class="col-sm-8 ms-5">
                     <div class="form-floating mt-2">
-                        <input type="text" class="form-control" id="tituloProyecto" name="tituloProyecto" placeholder="tituloProyecto">
+                        <input type="text" class="form-control" maxlength="45" id="tituloProyecto" name="tituloProyecto" placeholder="tituloProyecto">
                     </div>
             </div>
 
             <h3 class="ms-5 mt-2" style="text-align: left;">Descripción del proyecto:</h3>
             <div class="col-sm-8 ms-5">
                 <div class="form-floating mt-2">
-                    <textarea class="form-control" id="descripcionProyecto" name="descripcionProyecto" placeholder="descripcionProyecto" style="height: 100px;"></textarea>
+                    <textarea class="form-control" id="descripcionProyecto" maxlength="45" name="descripcionProyecto" placeholder="descripcionProyecto" style="height: 100px;"></textarea>
                 </div>
             </div>
             
