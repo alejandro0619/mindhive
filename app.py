@@ -7,7 +7,7 @@ from routes.user import user_bp
 
 # Config:
 from config import Config
-from lib.queue_message import messages
+# from lib.queue_message import messages
 
 # Factory dispatches an instance of the app
 def make_app():

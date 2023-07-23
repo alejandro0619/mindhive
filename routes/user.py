@@ -225,8 +225,8 @@ def leave_project(id):
     creator = cursor.fetchone()
 
     if creator['User_project_creator'] != uid:
-        query = "DELETE FROM user_has_project WHERE User_uid = %s"
-        cursor.execute(query, (uid,))
+        query = "DELETE FROM user_has_project WHERE User_uid = %s AND Project_project_id = %s"
+        cursor.execute(query, (uid, id,))
         mysql.connection.commit()
         
 
