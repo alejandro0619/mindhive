@@ -4,14 +4,14 @@ import MySQLdb.cursors
 from datetime import date, datetime
 import re
 import hashlib
-from flask_socketio import emit, SocketIO
+
 from lib.shareable_code import gen_shareable_code
 from lib.query_dispatcher import dispatcher
 
 user_bp = Blueprint("user", __name__)
 messages = []
 
-# Set the websocket for notification handling
+
 @user_bp.route('/')
 def root():
     return redirect(url_for("user.dashboard", by = 1))
@@ -215,7 +215,7 @@ def edit_project(id):
         
 @user_bp.route("/leaveProject/<id>", methods=['POST'])
 def leave_project(id):
-    socket = current_app.config['WS']
+   
     mysql = current_app.config['MYSQL']
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     uid = session['uid']

@@ -138,34 +138,7 @@
                             </select>
                         </div>
                     </div>
-
-                    <script>
-                        // Function to save the checkbox state to localStorage
-                        function saveCheckboxState() {
-                            var checkbox = document.getElementById("{{ activity['activity_id'] }}");
-                            localStorage.setItem("{{ activity['activity_id'] }}", checkbox.checked);
-                        }
-                        
-                        // Function to load the checkbox state from localStorage
-                        function loadCheckboxState() {
-                            var checkbox = document.getElementById("{{ activity['activity_id'] }}");
-                            var checkboxState = localStorage.getItem("{{ activity['activity_id'] }}");
-                            
-                            if (checkboxState === "true") {
-                                checkbox.checked = true;
-                            } else {
-                                checkbox.checked = false;
-                            }
-                        }
-                        
-                        // Add event listeners to save and load the checkbox state
-                        var checkbox = document.getElementById("{{ activity['activity_id'] }}");
-                        checkbox.addEventListener("change", saveCheckboxState);
-                        
-                        // Load the checkbox state when the page is loaded
-                        window.addEventListener("load", loadCheckboxState);
-                    </script>
-                    
+ 
                 </li>
                 {% endfor %}
             </ul>

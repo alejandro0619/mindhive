@@ -119,7 +119,7 @@
                     <form action="/projectAnnouncement/{{announcement['announcement_id']}}" method="POST">
                         <h3 class="ms-5 mt-2" style="text-align: left;">Añade un comentario:</h3>
                             <div class="form-floating mt-2">
-                                <textarea class="form-control" id="comentario" name="comentario" placeholder="comentario" style="height: 100px;"></textarea>
+                                <textarea class="form-control" maxlength="45" required id="comentario" name="comentario" placeholder="comentario" style="height: 100px;"></textarea>
                             </div>
                         
                         <div class="ms-5 mt-5 mb-5" style="text-align:left;">

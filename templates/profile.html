@@ -33,15 +33,15 @@
     <h3><strong>Edición de perfil</strong></h3>
     <h5>Edita los campos de tu perfil que deseas modificar</h5>
     <div class="form-floating">
-        <input type="email" class="form-control" maxlength="45" id="email" name="email" placeholder="email" value="{{ session['email'] }}">
+        <input type="email" class="form-control" required maxlength="45" id="email" name="email" placeholder="email" value="{{ session['email'] }}">
         <label for="email">E-mail</label>
     </div>
     <div class="form-floating mt-2">
-        <input type="text" class="form-control" id="nombre" maxlength="45" name="nombre" placeholder="nombre" value="{{ session['user_name']}}">
+        <input type="text" class="form-control" id="nombre" required maxlength="45" name="nombre" placeholder="nombre" value="{{ session['user_name']}}">
         <label for="nombre">Nombre</label>
     </div>
     <div class="form-floating mt-2">
-        <input type="password" class="form-control" id="password" maxlength="255" name="password" placeholder="Password">
+        <input type="password" class="form-control" id="password"  maxlength="255" name="password" placeholder="Password">
         <label for="password">Contraseña Actual</label>
     </div>
     <div class="form-floating mt-2">
