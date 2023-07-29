@@ -153,17 +153,12 @@ def create_project_view():
             while shareable_code in codes:
                 shareable_code = gen_shareable_code()
         # Once the information needed to create the project is filled. I need to create a group chat for this project 
-        create_group_chat_query = """
-        INSERT INTO group_chat VALUES (NULL)
-        """
-        cursor.execute(create_group_chat_query)
-        # This is potentially dangerous in case of multiple requests at the same time. Because there's no way to relate the last row to the user that's requesting the ID. This all depends on the order of the operations.
-        group_chat_id = cursor.lastrowid
+        
 
         create_project_query = """
-        INSERT INTO project VALUES (NULL, %s, %s, %s, %s, %s, %s, %s)
+        INSERT INTO project VALUES (NULL, %s, %s, %s, %s, %s, %s)
         """
-        cursor.execute(create_project_query, (project_title, project_description, starting_date, ending_date, shareable_code, user_uid, group_chat_id))
+        cursor.execute(create_project_query, (project_title, project_description, starting_date, ending_date, shareable_code, user_uid))
 
         insert_into_user_has_project = """
         INSERT INTO user_has_project VALUES (%s, %s)
@@ -213,7 +208,7 @@ def edit_project(id):
         else:
             return redirect(url_for('user.root'))
         
-@user_bp.route("/leaveProject/<id>", methods=['POST'])
+@user_bp.route("/leaveProject/<id>", methods=['GET'])
 def leave_project(id):
    
     mysql = current_app.config['MYSQL']
@@ -318,10 +313,7 @@ def project_view(id):
             return render_template("project.html", project_id = id, project = project, activities = activities, announcements = announcements, participants=participants)
         else:
             return redirect(url_for("auth.login"))
-            
-@user_bp.route("/chat/<projectId>", methods=['GET'])
-def project_chat(project_id):
-    return render_template("groupChat.html")
+        
 
 @user_bp.route("/activity/<id>", methods=['GET', 'POST'])
 def create_activity(id):
