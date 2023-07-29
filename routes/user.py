@@ -372,6 +372,31 @@ def edit_activity(project_id, id):
             return render_template("activityCreate.html", route = "editActivity", project_id =  project_id,  project = project, activity_name =  activity['activity_name'], activity_id = '/' + id)
     else: 
         return redirect(url_for('auth.login'))
+    
+@user_bp.route("/deleteActivity/<project_id>/<id>", methods =['GET'])
+def delete_activity(project_id, id):
+    mysql = current_app.config['MYSQL']
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    query = """
+            SELECT * FROM project WHERE project_id = %s
+            """
+    cursor.execute(query, (project_id,))
+    project = cursor.fetchone()
+
+    if "loggedin" in session:
+
+        if request.method == "GET":
+            activity_delete = """
+            DELETE FROM activity
+            WHERE activity_id = %s
+            """
+            cursor.execute(activity_delete, ( id,))
+            mysql.connection.commit()
+
+            return redirect(url_for('user.project_view', id = project_id)) 
+
+    else: 
+        return redirect(url_for('auth.login'))
 
 @user_bp.route("/createAnnouncement/<id>", methods=['GET', 'POST'])
 def create_announcement(id):
