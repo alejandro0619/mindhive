@@ -208,6 +208,82 @@ def edit_project(id):
         else:
             return redirect(url_for('user.root'))
         
+@user_bp.route("/deleteAnnouncement/<id>", methods=['GET'])
+def delete_announcement(id):
+    mysql = current_app.config['MYSQL']
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+
+    get_announcement_creator = "SELECT User_uid as creator, project_project_id as project from announcement where announcement_id = %s" 
+    cursor.execute(get_announcement_creator, (id,))
+    announcement_creator_id = cursor.fetchone()
+    project = announcement_creator_id['project']
+
+    if announcement_creator_id['creator'] != session['uid']:
+        return redirect(url_for("user.root"))
+    else:
+
+        query = "DELETE FROM announcement WHERE announcement_id = %s"
+        cursor.execute(query, (id,))
+        mysql.connection.commit()
+        return redirect(url_for("user.project_view", id=project))
+    
+@user_bp.route("/editAnnouncement/<project_id>/<id>", methods=['GET', 'POST'])
+def edit_announcement(project_id, id):
+    mysql = current_app.config['MYSQL']
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+
+    get_project = 'SELECT * from project where project_id = %s'
+    cursor.execute(get_project, (project_id,))
+    project = cursor.fetchone()
+
+
+    if request.method == 'POST':
+        if 'loggedin' in session:
+            announcement_title = request.form['tituloAnuncio']
+            announcement_description = request.form["descripcionAnuncio"]
+
+            query = """
+            UPDATE announcement
+            SET announcement_name = %s,
+                announcement_description = %s
+            WHERE announcement_id = %s
+            """
+            cursor.execute(query, (announcement_title, announcement_description, id))
+            mysql.connection.commit()
+            return redirect(url_for('user.project_view', id=project_id))
+
+    elif request.method == 'GET':
+        uid = session['uid']
+        query = "SELECT User_uid from announcement where announcement_id = %s"
+        cursor.execute(query, (id, ))
+        announcement_creator_id = cursor.fetchone()
+
+        if (str(announcement_creator_id['User_uid']) == str(uid)):
+            return render_template("announcementCreate.html",project=project, route = "editAnnouncement", announcement_id = '/' + id, title_label = "Edición", button_label = 'Editar')
+        else:
+            return redirect(url_for('user.root'))
+        
+@user_bp.route("/deleteProject/<id>", methods=['GET'])
+def delete_project(id):
+    mysql = current_app.config['MYSQL']
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+
+    get_project_creator = "SELECT User_project_creator as creator from project where project_id = %s" 
+    cursor.execute(get_project_creator, (id,))
+    project_creator_id = cursor.fetchone()
+
+    if project_creator_id['creator'] != session['uid']:
+        return redirect(url_for("user.root"))
+    else:
+        cursor.execute("DELETE FROM user_has_project WHERE Project_project_id = %s",(id,))
+        cursor.execute("DELETE FROM activity WHERE  Project_project_id = %s", (id,))
+        cursor.execute("DELETE FROM announcement WHERE Proje")
+        query = "DELETE FROM project WHERE project_id = %s"
+        cursor.execute(query, (id,))
+        mysql.connection.commit()
+        return redirect(url_for("user.root"))
+
+        
 @user_bp.route("/leaveProject/<id>", methods=['GET'])
 def leave_project(id):
    
@@ -422,7 +498,7 @@ def create_announcement(id):
 
     elif request.method == 'GET':
         if "loggedin" in session:           
-            return render_template("announcementCreate.html", project_id = id,  project = project)
+            return render_template("announcementCreate.html", project_id = id,  project = project , route = "createAnnouncement", title_label = "Creación", button_label = 'Crear')
         else:
              return redirect(url_for("auth.login"))
             

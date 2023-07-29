@@ -30,17 +30,17 @@
         </div>
     </nav>
 
-    <form action="/createAnnouncement/{{project['project_id']}}" method="POST">
+    <form action="/{{route}}/{{project['project_id']}}{{announcement_id}}" method="POST">
 
             
-            <h1 class="text-align: left mt-3 mb-3 ms-4" style = "text-align: left;">Creación de Anuncio</h1>
+            <h1 class="text-align: left mt-3 mb-3 ms-4" style = "text-align: left;">{{title_label}} de Anuncio</h1>
             <div class="line"></div>
             <div class="mt-4 ms-4" style="text-align: left; ">
                 <h1><strong>{{project['project_title']}}</strong></h1>
                 <h3>"{{project['project_description']}}"</h3>
             </div>      
             
-            <h3 class="ms-5 mt-5"  style="text-align: left;">Titulo del anuncio:</h3>
+            <h3 class="ms-5 mt-5"  style="text-align: left;">Título del anuncio:</h3>
             <div class="col-sm-8 ms-5">
                     <div class="form-floating mt-2">
                         <input type="text" maxlength="45" class="form-control" id="tituloAnuncio" name="tituloAnuncio" placeholder="tituloAnuncio">
@@ -55,7 +55,7 @@
             </div>
 
             <div class="ms-5 mt-5 mb-5" style="text-align:left;">
-                <button class="w-10 btn btn-lg btn-primary" style="background-color: darkgreen;" type="submit">Crear Anuncio</button>
+                <button class="w-10 btn btn-lg btn-primary" style="background-color: darkgreen;" type="submit">{{button_label}}</button>
             </div>
             
     </form>

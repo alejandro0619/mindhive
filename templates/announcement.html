@@ -43,7 +43,7 @@
                             <h4 style="word-break: break-all;">{{announcement['user_name']}}</h4> 
                         </div>
                         <div class="col-sm-6 ">
-                            <select class="me-3" id="{{ announcement['announcement_id'] }}" onchange="modifyAnnouncement('{{ announcement['announcement_id'] }}')"> 
+                            <select class="me-3" id="{{ announcement['announcement_id'] }}" onchange="modifyAnnouncement('{{ announcement['announcement_id'] }}', '{{announcement['project_project_id']}}')"> 
                                 <option value="">...</option>
                                 <option value="editar">Editar Anuncio</option>
                                 <option value="borrar">Borrar Anuncio</option>
@@ -53,12 +53,12 @@
                    
 
                     <script>
-                        function modifyAnnouncement(announcementId) {
+                        function modifyAnnouncement(announcementId, projectId) {
                           var selectElement = document.getElementById("{{ announcement['announcement_id'] }}");
                           var selectedOption = selectElement.value;
                       
                           if (selectedOption === "editar") {
-                            window.location.href = "/editAnnouncement/"+announcementId;
+                            window.location.href = "/editAnnouncement/"+projectId+"/"+announcementId;
                           } else if (selectedOption === "borrar") {
                             window.location.href = "/deleteAnnouncement/"+announcementId;
                           } 
