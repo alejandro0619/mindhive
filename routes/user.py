@@ -213,19 +213,19 @@ def delete_announcement(id):
     mysql = current_app.config['MYSQL']
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
 
-    get_announcement_creator = "SELECT User_uid as creator, project_project_id as project from announcement where announcement_id = %s" 
-    cursor.execute(get_announcement_creator, (id,))
-    announcement_creator_id = cursor.fetchone()
-    project = announcement_creator_id['project']
+    announcementq = "SELECT * from announcement where announcement_id = %s" 
+    cursor.execute(announcementq, (id,))
+    announcement = cursor.fetchone()
+    project = announcement['Project_project_id']
 
-    if announcement_creator_id['creator'] != session['uid']:
-        return redirect(url_for("user.root"))
+    if announcement['User_uid'] != session['uid']:
+        return redirect(url_for('user.announcement', id=announcement['announcement_id']))
     else:
 
         query = "DELETE FROM announcement WHERE announcement_id = %s"
         cursor.execute(query, (id,))
         mysql.connection.commit()
-        return redirect(url_for("user.project_view", id=project))
+        return redirect(url_for('user.project_view', id=project))
     
 @user_bp.route("/editAnnouncement/<project_id>/<id>", methods=['GET', 'POST'])
 def edit_announcement(project_id, id):
@@ -235,6 +235,9 @@ def edit_announcement(project_id, id):
     get_project = 'SELECT * from project where project_id = %s'
     cursor.execute(get_project, (project_id,))
     project = cursor.fetchone()
+    cursor.execute("SELECT * from announcement where announcement_id = %s", (id,))
+    announcement =cursor.fetchone()
+   
 
 
     if request.method == 'POST':
@@ -250,10 +253,12 @@ def edit_announcement(project_id, id):
             """
             cursor.execute(query, (announcement_title, announcement_description, id))
             mysql.connection.commit()
-            return redirect(url_for('user.project_view', id=project_id))
+            return redirect(url_for('user.announcement', id=announcement['announcement_id']))
 
     elif request.method == 'GET':
         uid = session['uid']
+        print("Wtf", announcement)
+
         query = "SELECT User_uid from announcement where announcement_id = %s"
         cursor.execute(query, (id, ))
         announcement_creator_id = cursor.fetchone()
@@ -261,7 +266,52 @@ def edit_announcement(project_id, id):
         if (str(announcement_creator_id['User_uid']) == str(uid)):
             return render_template("announcementCreate.html",project=project, route = "editAnnouncement", announcement_id = '/' + id, title_label = "Edición", button_label = 'Editar')
         else:
-            return redirect(url_for('user.root'))
+            return redirect(url_for('user.announcement', id=announcement['announcement_id']))
+        
+@user_bp.route("/editComment/<id>", methods=["GET", 'POST'])
+def edit_comment(id):
+    mysql = current_app.config['MYSQL']
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    get_comment = "SELECT * FROM comment JOIN announcement ON announcement.announcement_id = comment.Announcement_announcement_id where comment_id =%s"
+    cursor.execute(get_comment, (id,))
+    comment = cursor.fetchone()
+    
+    if "loggedin" in session:
+        if request.method =="GET":
+            if comment['User_uid'] != session['uid']:
+                return redirect(url_for("user.announcement", id=comment['announcement_id']))
+            else:
+                return render_template("commentEdit.html", comment=comment)
+            
+        else:
+            newComment = request.form['contenidoComentario']
+            edit = "UPDATE comment SET comment_content = %s WHERE comment_id = %s"
+            cursor.execute(edit, (newComment, id,))
+            mysql.connection.commit()
+            return redirect(url_for("user.announcement", id=comment['announcement_id']))
+    else:
+        return redirect(url_for("auth.login"))
+
+@user_bp.route("/deleteComment/<id>")
+def delete_comment(id):
+    mysql = current_app.config['MYSQL']
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    get_comment = "SELECT * FROM comment where comment_id =%s"
+    cursor.execute(get_comment, (id,))
+    comment = cursor.fetchone()
+
+    if "loggedin" in session:
+        print("hola ",comment)
+        if (comment['User_uid'] != session['uid']):
+            return redirect(url_for("user.announcement", id=comment['Announcement_announcement_id']))
+        else:
+            cursor.execute("DELETE FROM COMMENT WHERE COMMENT_ID = %s", (id,))
+            mysql.connection.commit()
+            return redirect(url_for("user.announcement", id=comment['Announcement_announcement_id']))
+
+    else:
+        return(redirect(url_for("auth.login")))
+
         
 @user_bp.route("/deleteProject/<id>", methods=['GET'])
 def delete_project(id):
@@ -275,9 +325,6 @@ def delete_project(id):
     if project_creator_id['creator'] != session['uid']:
         return redirect(url_for("user.root"))
     else:
-        cursor.execute("DELETE FROM user_has_project WHERE Project_project_id = %s",(id,))
-        cursor.execute("DELETE FROM activity WHERE  Project_project_id = %s", (id,))
-        cursor.execute("DELETE FROM announcement WHERE Proje")
         query = "DELETE FROM project WHERE project_id = %s"
         cursor.execute(query, (id,))
         mysql.connection.commit()
