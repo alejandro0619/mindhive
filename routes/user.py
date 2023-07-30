@@ -410,7 +410,7 @@ def add_member():
 
 @user_bp.route("/viewProject/<id>", methods=['GET'])
 def project_view(id):
-    msg=""
+    msg = request.args.get('msg', '')
     if request.method == 'GET':
         if 'loggedin' in session: 
             query = """
@@ -601,7 +601,7 @@ def share_code(id):
         
 @user_bp.route("/projectAnnouncement/<id>", methods=['GET', 'POST'])
 def announcement(id):
-     msg=""
+     msg = request.args.get('msg', '')
      if request.method == 'POST':
         mysql = current_app.config['MYSQL']
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
@@ -627,8 +627,8 @@ def announcement(id):
            list_recipients.append( recipient['email'] )
         print(list_recipients)
         mail = Mail(current_app)
-        msg = Message(sender = 'mindhive025@gmail.com', recipients = list_recipients, subject="Notificación Mindhive", body=("Se ha registrado un nuevo comentario en el anuncio: ' "+str(announcement['announcement_name'])+"' del proyecto: '"+str(project['project_title'])+ "' al que pertenece. Ingrese en MindHive para visualizarlo"))
-        mail.send(msg)
+        mail_msg = Message(sender = 'mindhive025@gmail.com', recipients = list_recipients, subject="Notificación Mindhive", body=("Se ha registrado un nuevo comentario en el anuncio: ' "+str(announcement['announcement_name'])+"' del proyecto: '"+str(project['project_title'])+ "' al que pertenece. Ingrese en MindHive para visualizarlo"))
+        mail.send(mail_msg)
         
         cursor.execute(insert_comment, (commentary, session['uid'], announcement['announcement_id'],))   
         mysql.connection.commit()
@@ -638,7 +638,7 @@ def announcement(id):
         cursor.execute(comment_query, (announcement['announcement_id'],))
         comments = [comment for comment in cursor.fetchall()]
     
-        return render_template("announcement.html", announcement = announcement, comments=comments, id=id)
+        return render_template("announcement.html", announcement = announcement, comments=comments, id=id, msg=msg)
 
      elif request.method == 'GET':
         if "loggedin" in session: 
@@ -657,7 +657,7 @@ def announcement(id):
             comments = [comment for comment in cursor.fetchall()]
 
             
-            return render_template("announcement.html", announcement = announcement, comments=comments, id=id)
+            return render_template("announcement.html", announcement = announcement, comments=comments, id=id, msg=msg)
         else:
             return redirect(url_for("auth.login"))
             return redirect(url_for("auth.login"))
