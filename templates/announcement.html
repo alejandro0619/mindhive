@@ -34,16 +34,17 @@
 
             
             <h1 class="text-align: left mt-3 mb-3 ms-4" style = "text-align: left;">Anuncio del proyecto</h1>
+            <div class="msg">{{ msg }}</div>
             <div class="line"></div>
             <div class="row me-3 mt-3 ms-3" style="list-style-type: none; padding-right: 40px; border: 1px solid #000; border-radius: 1%;">
                 <div class="col-sm-9 mt-3" style="text-align: left; padding-left: 25px;">   
                     
                     <div class="row">
                         <div class="col-sm-6 ">
-                            <h4>{{announcement['user_name']}}</h4> 
+                            <h4 style="word-break: break-all;">{{announcement['user_name']}}</h4> 
                         </div>
                         <div class="col-sm-6 ">
-                            <select class="me-3" id="{{ announcement['announcement_id'] }}" onchange="modifyAnnouncement('{{ announcement['announcement_id'] }}')"> 
+                            <select class="me-3" id="{{ announcement['announcement_id'] }}" onchange="modifyAnnouncement('{{ announcement['announcement_id'] }}', '{{announcement['project_project_id']}}')"> 
                                 <option value="">...</option>
                                 <option value="editar">Editar Anuncio</option>
                                 <option value="borrar">Borrar Anuncio</option>
@@ -53,12 +54,12 @@
                    
 
                     <script>
-                        function modifyAnnouncement(announcementId) {
+                        function modifyAnnouncement(announcementId, projectId) {
                           var selectElement = document.getElementById("{{ announcement['announcement_id'] }}");
                           var selectedOption = selectElement.value;
                       
                           if (selectedOption === "editar") {
-                            window.location.href = "/editAnnouncement/"+announcementId;
+                            window.location.href = "/editAnnouncement/"+projectId+"/"+announcementId;
                           } else if (selectedOption === "borrar") {
                             window.location.href = "/deleteAnnouncement/"+announcementId;
                           } 
@@ -70,8 +71,8 @@
                     <h5>{{announcement['announcement_Date']}}</h5>
                 </div>
                 <div class="line ms-3"></div>
-                <h5 class="mt-3" style = "padding-left: 25px; text-align: left;">{{ announcement['announcement_name'] }}</h5>
-                <h5 style = "padding-left: 25px; text-align: left;">"{{announcement['announcement_description']}}"</h5>
+                <h5 class="mt-3" style = "word-break: break-all; padding-left: 25px; padding-left: 25px; text-align: left;">{{ announcement['announcement_name'] }}</h5>
+                <h6 style = "word-break: break-all; padding-left: 25px; padding-left: 25px; text-align: left;">"{{announcement['announcement_description']}}"</h6>
               </div> 
 
 
@@ -82,7 +83,7 @@
                         <li class="mb-3" style="list-style-type: none; padding-right: 40px; border: 1px solid #000; border-radius: 5%;">
                             <div class="row">
                                 <div class="col-sm-6 ">
-                                    <h4 style="padding-left: 25px;">{{ comment['user_name']}}</h4> 
+                                    <h5  style="word-break: break-all; padding-left: 25px;">{{ comment['user_name']}}</h5> 
                                 </div>
                                 <div class="col-sm-6 ">
                                     <select class="me-3 mt-3" id="select_{{comment['comment_id']}}" onchange="modifyComment('{{ comment['comment_id']}}')"> 
@@ -94,9 +95,9 @@
                             </div>
                            
         
-                            
-                            <h5 style="padding-left: 25px;">{{ comment.comment_content }}</h5>
-                            <h5 style="text-align: right;">{{ comment.comment_date }}</h5>
+                            <div class="line ms-3"></div>
+                            <h6 style="padding-left: 25px; word-break: break-all;">"{{ comment.comment_content }}"</h6>
+                            <h5 style="text-align: right; word-break: break-all;">{{ comment.comment_date }}</h5>
                         </li>
                         
                     {% endfor %}
@@ -119,7 +120,7 @@
                     <form action="/projectAnnouncement/{{announcement['announcement_id']}}" method="POST">
                         <h3 class="ms-5 mt-2" style="text-align: left;">Añade un comentario:</h3>
                             <div class="form-floating mt-2">
-                                <textarea class="form-control" id="comentario" name="comentario" placeholder="comentario" style="height: 100px;"></textarea>
+                                <textarea class="form-control" maxlength="100" required id="comentario" name="comentario" placeholder="comentario" style="height: 100px;"></textarea>
                             </div>
                         
                         <div class="ms-5 mt-5 mb-5" style="text-align:left;">

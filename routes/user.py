@@ -4,14 +4,15 @@ import MySQLdb.cursors
 from datetime import date, datetime
 import re
 import hashlib
-from flask_socketio import emit, SocketIO
+from flask_mail import Mail, Message
+
 from lib.shareable_code import gen_shareable_code
 from lib.query_dispatcher import dispatcher
 
 user_bp = Blueprint("user", __name__)
 messages = []
 
-# Set the websocket for notification handling
+
 @user_bp.route('/')
 def root():
     return redirect(url_for("user.dashboard", by = 1))
@@ -128,6 +129,9 @@ def profile_view():
 
 @user_bp.route("/createProject", methods=['GET', 'POST'])
 def create_project_view():
+
+
+
     mysql = current_app.config['MYSQL']
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     if request.method == "POST":
@@ -153,17 +157,12 @@ def create_project_view():
             while shareable_code in codes:
                 shareable_code = gen_shareable_code()
         # Once the information needed to create the project is filled. I need to create a group chat for this project 
-        create_group_chat_query = """
-        INSERT INTO group_chat VALUES (NULL)
-        """
-        cursor.execute(create_group_chat_query)
-        # This is potentially dangerous in case of multiple requests at the same time. Because there's no way to relate the last row to the user that's requesting the ID. This all depends on the order of the operations.
-        group_chat_id = cursor.lastrowid
+        
 
         create_project_query = """
-        INSERT INTO project VALUES (NULL, %s, %s, %s, %s, %s, %s, %s)
+        INSERT INTO project VALUES (NULL, %s, %s, %s, %s, %s, %s)
         """
-        cursor.execute(create_project_query, (project_title, project_description, starting_date, ending_date, shareable_code, user_uid, group_chat_id))
+        cursor.execute(create_project_query, (project_title, project_description, starting_date, ending_date, shareable_code, user_uid))
 
         insert_into_user_has_project = """
         INSERT INTO user_has_project VALUES (%s, %s)
@@ -211,11 +210,141 @@ def edit_project(id):
         if (str(project_creator_id['User_project_creator']) == str(uid)):
             return render_template("projectCreate.html", route = "editProject", project_id = '/' + id, title_label = "Edición", button_label = 'Editar proyecto')
         else:
-            return redirect(url_for('user.root'))
+            msg="Sólo el creador del proyecto puede editarlo"
+            return redirect(url_for('user.project_view', id=id, msg=msg ))
         
-@user_bp.route("/leaveProject/<id>", methods=['POST'])
+@user_bp.route("/deleteAnnouncement/<id>", methods=['GET'])
+def delete_announcement(id):
+    mysql = current_app.config['MYSQL']
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+
+    announcementq = "SELECT * from announcement where announcement_id = %s" 
+    cursor.execute(announcementq, (id,))
+    announcement = cursor.fetchone()
+    project = announcement['Project_project_id']
+
+    if announcement['User_uid'] != session['uid']:
+        msg="Sólo el creador del anuncio puede eliminarlo"
+        return redirect(url_for('user.announcement', id=announcement['announcement_id'], msg=msg))
+    else:
+
+        query = "DELETE FROM announcement WHERE announcement_id = %s"
+        cursor.execute(query, (id,))
+        mysql.connection.commit()
+        return redirect(url_for('user.project_view', id=project))
+    
+@user_bp.route("/editAnnouncement/<project_id>/<id>", methods=['GET', 'POST'])
+def edit_announcement(project_id, id):
+    mysql = current_app.config['MYSQL']
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+
+    get_project = 'SELECT * from project where project_id = %s'
+    cursor.execute(get_project, (project_id,))
+    project = cursor.fetchone()
+    cursor.execute("SELECT * from announcement where announcement_id = %s", (id,))
+    announcement =cursor.fetchone()
+   
+
+
+    if request.method == 'POST':
+        if 'loggedin' in session:
+            announcement_title = request.form['tituloAnuncio']
+            announcement_description = request.form["descripcionAnuncio"]
+
+            query = """
+            UPDATE announcement
+            SET announcement_name = %s,
+                announcement_description = %s
+            WHERE announcement_id = %s
+            """
+            cursor.execute(query, (announcement_title, announcement_description, id))
+            mysql.connection.commit()
+            return redirect(url_for('user.announcement', id=announcement['announcement_id']))
+
+    elif request.method == 'GET':
+        uid = session['uid']
+        
+
+        query = "SELECT User_uid from announcement where announcement_id = %s"
+        cursor.execute(query, (id, ))
+        announcement_creator_id = cursor.fetchone()
+
+        if (str(announcement_creator_id['User_uid']) == str(uid)):
+            return render_template("announcementCreate.html",project=project, route = "editAnnouncement", announcement_id = '/' + id, title_label = "Edición", button_label = 'Editar')
+        else:
+            msg="Sólo el creador del anuncio puede editarlo"
+            return redirect(url_for('user.announcement', id=announcement['announcement_id'], msg=msg))
+        
+@user_bp.route("/editComment/<id>", methods=["GET", 'POST'])
+def edit_comment(id):
+    mysql = current_app.config['MYSQL']
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    get_comment = "SELECT * FROM comment JOIN announcement ON announcement.announcement_id = comment.Announcement_announcement_id where comment_id =%s"
+    cursor.execute(get_comment, (id,))
+    comment = cursor.fetchone()
+    
+    if "loggedin" in session:
+        if request.method =="GET":
+            if comment['User_uid'] != session['uid']:
+                msg="Sólo el creador del comentario puede editarlo"
+                return redirect(url_for("user.announcement", id=comment['announcement_id'], msg=msg))
+            else:
+                return render_template("commentEdit.html", comment=comment)
+            
+        else:
+            newComment = request.form['contenidoComentario']
+            edit = "UPDATE comment SET comment_content = %s WHERE comment_id = %s"
+            cursor.execute(edit, (newComment, id,))
+            mysql.connection.commit()
+            return redirect(url_for("user.announcement", id=comment['announcement_id']))
+    else:
+        return redirect(url_for("auth.login"))
+
+@user_bp.route("/deleteComment/<id>")
+def delete_comment(id):
+    mysql = current_app.config['MYSQL']
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    get_comment = "SELECT * FROM comment where comment_id =%s"
+    cursor.execute(get_comment, (id,))
+    comment = cursor.fetchone()
+
+    if "loggedin" in session:
+        print("hola ",comment)
+        if (comment['User_uid'] != session['uid']):
+            msg="Sólo el creador del comentario puede eliminarlo"
+            return redirect(url_for("user.announcement", id=comment['Announcement_announcement_id'], msg=msg))
+        else:
+            cursor.execute("DELETE FROM COMMENT WHERE COMMENT_ID = %s", (id,))
+            mysql.connection.commit()
+            return redirect(url_for("user.announcement", id=comment['Announcement_announcement_id']))
+
+    else:
+        return(redirect(url_for("auth.login")))
+
+        
+@user_bp.route("/deleteProject/<id>", methods=['GET'])
+def delete_project(id):
+    mysql = current_app.config['MYSQL']
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+
+    get_project_creator = "SELECT User_project_creator as creator from project where project_id = %s" 
+    cursor.execute(get_project_creator, (id,))
+    project_creator_id = cursor.fetchone()
+
+    if project_creator_id['creator'] != session['uid']:
+        msg="Sólo el creador del proyecto puede eliminarlo"
+        return redirect(url_for('user.project_view', id=id, msg=msg ))
+        
+    else:
+        query = "DELETE FROM project WHERE project_id = %s"
+        cursor.execute(query, (id,))
+        mysql.connection.commit()
+        return redirect(url_for("user.root"))
+
+        
+@user_bp.route("/leaveProject/<id>", methods=['GET'])
 def leave_project(id):
-    socket = current_app.config['WS']
+   
     mysql = current_app.config['MYSQL']
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     uid = session['uid']
@@ -234,8 +363,8 @@ def leave_project(id):
         return redirect(url_for("user.root"))
     else:
         # socket.emit('show_notification', "Eres el creador del proyecto, no puedes salir.")
-        messages.append("Eres el creador del proyecto, no puedes salir")
-        return redirect(url_for("user.root"))
+        msg="Usted es el creador del proyecto, no puede salir del mismo, pero puede eliminarlo si lo desea "
+        return redirect(url_for('user.project_view', id=id, msg=msg ))
     
 
 @user_bp.route('/adduser', methods=['POST'])
@@ -281,6 +410,7 @@ def add_member():
 
 @user_bp.route("/viewProject/<id>", methods=['GET'])
 def project_view(id):
+    msg=""
     if request.method == 'GET':
         if 'loggedin' in session: 
             query = """
@@ -301,7 +431,7 @@ def project_view(id):
         # Rest of the code
 
             project_announcements= """
-            SELECT announcement.announcement_name, announcement.announcement_id, announcement.announcement_description, announcement.announcement_date, user.uid, user.user_name FROM announcement JOIN user on user.uid = announcement.user_uid WHERE Project_project_id = %s 
+            SELECT announcement.announcement_name, announcement.announcement_id, announcement.announcement_description, announcement.announcement_date, user.uid, user.user_name FROM announcement JOIN user on user.uid = announcement.user_uid WHERE Project_project_id = %s ORDER BY announcement.announcement_date 
               """
             cursor.execute(project_announcements, (id,))
             announcements = [announcement for announcement in cursor.fetchall()]
@@ -315,13 +445,10 @@ def project_view(id):
             # print(announcements)
             # print(participants)
 
-            return render_template("project.html", project_id = id, project = project, activities = activities, announcements = announcements, participants=participants)
+            return render_template("project.html", project_id = id, project = project, activities = activities, announcements = announcements, participants=participants, msg=msg)
         else:
             return redirect(url_for("auth.login"))
-            
-@user_bp.route("/chat/<projectId>", methods=['GET'])
-def project_chat(project_id):
-    return render_template("groupChat.html")
+        
 
 @user_bp.route("/activity/<id>", methods=['GET', 'POST'])
 def create_activity(id):
@@ -339,8 +466,18 @@ def create_activity(id):
         INSERT INTO activity VALUES (NULL, %s, %s, 0)
         """
         cursor.execute(activity_insert, (activity_title, id,))
-
         mysql.connection.commit()
+
+        get_recipients = "SELECT user.email as email from user JOIN user_has_project ON user_has_project.User_uid = user.uid JOIN project ON project.project_id = user_has_project.Project_project_id WHERE project.project_id = %s;"
+        cursor.execute(get_recipients, (project['project_id'],))
+        recipients = cursor.fetchall()
+        list_recipients=[]
+        for recipient in recipients:
+           list_recipients.append( recipient['email'] )
+        print(list_recipients)
+        mail = Mail(current_app)
+        msg = Message(sender = 'mindhive025@gmail.com', recipients = list_recipients, subject="Notificación Mindhive", body=("Se ha registrado una actividad nueva en el proyecto: ' "+str(project['project_title'])+"' al que pertenece. Ingrese a MindHive para visualizarlo "))
+        mail.send(msg)
         return redirect(url_for('user.project_view', id=id))     
 
     elif request.method == 'GET':
@@ -380,6 +517,31 @@ def edit_activity(project_id, id):
             return render_template("activityCreate.html", route = "editActivity", project_id =  project_id,  project = project, activity_name =  activity['activity_name'], activity_id = '/' + id)
     else: 
         return redirect(url_for('auth.login'))
+    
+@user_bp.route("/deleteActivity/<project_id>/<id>", methods =['GET'])
+def delete_activity(project_id, id):
+    mysql = current_app.config['MYSQL']
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    query = """
+            SELECT * FROM project WHERE project_id = %s
+            """
+    cursor.execute(query, (project_id,))
+    project = cursor.fetchone()
+
+    if "loggedin" in session:
+
+        if request.method == "GET":
+            activity_delete = """
+            DELETE FROM activity
+            WHERE activity_id = %s
+            """
+            cursor.execute(activity_delete, ( id,))
+            mysql.connection.commit()
+
+            return redirect(url_for('user.project_view', id = project_id)) 
+
+    else: 
+        return redirect(url_for('auth.login'))
 
 @user_bp.route("/createAnnouncement/<id>", methods=['GET', 'POST'])
 def create_announcement(id):
@@ -401,11 +563,22 @@ def create_announcement(id):
         cursor.execute(announcement_insert, (announcement_title, announcement_description, session['uid'], id))
         test = cursor.fetchall()
         mysql.connection.commit()
+
+        get_recipients = "SELECT user.email as email from user JOIN user_has_project ON user_has_project.User_uid = user.uid JOIN project ON project.project_id = user_has_project.Project_project_id WHERE project.project_id = %s;"
+        cursor.execute(get_recipients, (project['project_id'],))
+        recipients = cursor.fetchall()
+        list_recipients=[]
+        for recipient in recipients:
+           list_recipients.append( recipient['email'] )
+        print(list_recipients)
+        mail = Mail(current_app)
+        msg = Message(sender = 'mindhive025@gmail.com', recipients = list_recipients, subject="Notificación Mindhive", body=("Se ha registrado un anuncio nuevo en el proyecto:  '"+str(project['project_title'])+"' al que pertenece. Ingrese a MindHive para visualizarlo"))
+        mail.send(msg)
         return redirect(url_for('user.project_view', id=id))     
 
     elif request.method == 'GET':
         if "loggedin" in session:           
-            return render_template("announcementCreate.html", project_id = id,  project = project)
+            return render_template("announcementCreate.html", project_id = id,  project = project , route = "createAnnouncement", title_label = "Creación", button_label = 'Crear')
         else:
              return redirect(url_for("auth.login"))
             
@@ -428,6 +601,7 @@ def share_code(id):
         
 @user_bp.route("/projectAnnouncement/<id>", methods=['GET', 'POST'])
 def announcement(id):
+     msg=""
      if request.method == 'POST':
         mysql = current_app.config['MYSQL']
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
@@ -440,11 +614,26 @@ def announcement(id):
                 """
         cursor.execute(query, (id,))
         announcement = cursor.fetchone()
+
+        get_project = "SELECT * from project join announcement on announcement.project_project_id = project.project_id where announcement.announcement_id = %s"
+        cursor.execute(get_project, (id,))
+        project = cursor.fetchone()
+
+        get_recipients = "SELECT user.email as email from user JOIN user_has_project ON user_has_project.User_uid = user.uid JOIN project ON project.project_id = user_has_project.Project_project_id WHERE project.project_id = %s;"
+        cursor.execute(get_recipients, (announcement['project_project_id'],))
+        recipients = cursor.fetchall()
+        list_recipients=[]
+        for recipient in recipients:
+           list_recipients.append( recipient['email'] )
+        print(list_recipients)
+        mail = Mail(current_app)
+        msg = Message(sender = 'mindhive025@gmail.com', recipients = list_recipients, subject="Notificación Mindhive", body=("Se ha registrado un nuevo comentario en el anuncio: ' "+str(announcement['announcement_name'])+"' del proyecto: '"+str(project['project_title'])+ "' al que pertenece. Ingrese en MindHive para visualizarlo"))
+        mail.send(msg)
         
         cursor.execute(insert_comment, (commentary, session['uid'], announcement['announcement_id'],))   
         mysql.connection.commit()
         comment_query = """
-            SELECT comment.comment_id, comment_content, comment.comment_date, comment.User_uid, user.user_name  FROM comment JOIN user ON user.uid = comment.User_uid WHERE comment.Announcement_announcement_id = %s;
+            SELECT comment.comment_id, comment_content, comment.comment_date, comment.User_uid, user.user_name  FROM comment JOIN user ON user.uid = comment.User_uid WHERE comment.Announcement_announcement_id = %s ORDER BY comment.comment_date;
             """
         cursor.execute(comment_query, (announcement['announcement_id'],))
         comments = [comment for comment in cursor.fetchall()]

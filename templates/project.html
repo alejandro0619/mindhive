@@ -33,20 +33,16 @@
     
     <!-- Navbar for the bottom section -->
     <nav class="navbar navbar-expand-sm navbar-dark bg-white">
-        <row class="ms-3">
-            <h3 class="text-align=left mb-3">{{project['project_title']}}</h3>
-            <p class="text-align=left mb-0">"{{project['project_description']}}"</p>
+        <row class="ms-3" style="padding-right: 50px;">
+            <h3 class="text-align=left mb-3"  style="word-break: break-all;">{{project['project_title']}}</h3>
+            <p class="text-align=left mb-0"  style="word-break: break-all;">"{{project['project_description']}}"</p>
+            <div class="msg">{{msg}}</div>
         </row>
-        
-        <select class="ms-5" id="{{ project['project_id'] }}" onchange="modifyProject('{{ project['project_id'] }}')"> 
+        <select id="{{ project['project_id'] }}" style="max-width: 40px; margin-left: -10px; margin-right: 10px;" onchange="modifyProject('{{ project['project_id'] }}')"> 
             <option value="">...</option>
             <option value="editar">Editar Proyecto</option>
             <option value="borrar">Borrar Proyecto</option>
         </select>
-
-        <form class="ms-5" action="/leaveProject/{{project['project_id']}}" method="POST">
-            <button class="btn btn-sm btn-primary" style="background-color: darkred;">Salir del Grupo</button>   
-        </form>    
 
         <script>
             function modifyProject(project_id) {
@@ -71,7 +67,7 @@
                                     <p class="mb-0"><strong>Fecha Inicio</strong></p>
                                         <p>{{project['starting_date']}}</p>
                                         <a href="/activity/{{project['project_id']}}">
-                                            <button class="btn btn-sm btn-primary" style="background-color: darkgreen;">Añadir Actividad</button>   
+                                            <button class="btn btn-sm btn-primary" style="background-color: darkgreen;">Crear Actividad</button>   
                                         </a>     
                                 </div>
                             </li>
@@ -80,7 +76,7 @@
                         <div class="col-sm-4">
                             <li>
                                 <div>
-                                    <p class="mb-0"><strong>Fecha Cierre</strong></p>
+                                    <p class="mb-0"><strong>Fecha Fin</strong></p>
                                     <p>{{project['ending_date']}}</p>
                                     <a href="/createAnnouncement/{{project['project_id']}}">
                                         <button class="btn btn-sm btn-primary" style="background-color: darkgreen;">Añadir Anuncio</button>   
@@ -93,10 +89,15 @@
                             <li>
                                 <div>
                                     <a href="/shareCode/{{project['project_id']}}">
-                                        <button class="btn btn-sm btn-primary mt-5"  style="background-color: darkgreen;">Añadir Miembros</button>  
+                                        <button class="btn btn-sm btn-primary"  style="background-color: darkgreen;">Añadir Miembros</button>      
                                     </a>
-                                   
                                 </div>
+                                <div style="margin-top: 10px;">
+                                    <a href="/leaveProject/{{project['project_id']}}">
+                                        <button class="btn btn-sm btn-primary" style="background-color: darkred;">Salir del Grupo</button>   
+                                    </a>
+                                </div>
+
                             </li>
                         </div>
 
@@ -113,59 +114,32 @@
     <div class="line"></div>
 
     <div class="row me-0 mt-3">
-        <div class="col-sm-3" style="padding-left: 50px;">            
-            <ul class="ms-0" style="list-style-type: none; padding-right: 40px; border: 1px solid #000; border-radius: 10%;">
+        <div class="col-sm-3" style="padding-left: 10px; padding-right: 0px;">            
+            <ul style="margin-left:10px; padding-left: 0px; list-style-type: none; padding-right: 0px; border: 1px solid #000; border-radius: 10%;">
                 <h5>Actividades del Proyecto:</h5>
              <!-- ...previous code... -->
 
-             <ul style="list-style-type: none;">
+            
                 {% for activity in activities %}
                 
-                <li>
-                    <div class="row me-0 mt-3 mb-3">
-                        <div class="col-sm-6" style="pvscode-file://vscode-app/opt/visual-studio-code/resources/app/out/vs/code/electron-sandbox/workbench/workbench.htmladding-left: 50px;">
+                <li class="mt-3 mb-2">
+                    
+                        
                             <div>
-                                <label>
-                                    <strong>{{ activity['activity_name'] }}</strong>
-                                </label>
+                                <h6  style="word-break: break-all;">
+                                    {{ activity['activity_name'] }}
+                                </h6>
                             </div>
-                        </div>
-                        <div class="col-sm-6" style="padding-left: 10px; text-align: left;">
-                            <select id="select_{{ activity['activity_id'] }}" onchange="redirectUser('{{ activity['activity_id'] }}', '{{project['project_id']}}')"> 
+                        
+                        
+                            <select style="max-width: 40px;" id="select_{{ activity['activity_id'] }}" onchange="redirectUser('{{ activity['activity_id'] }}', '{{project['project_id']}}')">
                                 <option value="">...</option>
                                 <option value="editar">Editar Actividad</option>
                                 <option value="borrar">Marcar como completado</option>
                             </select>
-                        </div>
-                    </div>
-
-                    <script>
-                        // Function to save the checkbox state to localStorage
-                        function saveCheckboxState() {
-                            var checkbox = document.getElementById("{{ activity['activity_id'] }}");
-                            localStorage.setItem("{{ activity['activity_id'] }}", checkbox.checked);
-                        }
                         
-                        // Function to load the checkbox state from localStorage
-                        function loadCheckboxState() {
-                            var checkbox = document.getElementById("{{ activity['activity_id'] }}");
-                            var checkboxState = localStorage.getItem("{{ activity['activity_id'] }}");
-                            
-                            if (checkboxState === "true") {
-                                checkbox.checked = true;
-                            } else {
-                                checkbox.checked = false;
-                            }
-                        }
-                        
-                        // Add event listeners to save and load the checkbox state
-                        var checkbox = document.getElementById("{{ activity['activity_id'] }}");
-                        checkbox.addEventListener("change", saveCheckboxState);
-                        
-                        // Load the checkbox state when the page is loaded
-                        window.addEventListener("load", loadCheckboxState);
-                    </script>
-                    
+                
+ 
                 </li>
                 {% endfor %}
             </ul>
@@ -179,7 +153,7 @@
                   if (selectedOption === "editar") {
                     window.location.href = "/editActivity/" + projectId + '/' + activityId;
                   } else if (selectedOption === "borrar") {
-                    window.location.href = "/deleteActivity/"+activityId;
+                    window.location.href = "/deleteActivity/"+ projectId + '/' + activityId;
                   } 
                 }
               </script>
@@ -197,32 +171,34 @@
           
         <div class="col-sm-6">
             <h4>Anuncios: </h4>
-            <ul style="list-style-type: none;">
+            <ul style="list-style-type: none; margin-left: 0px; padding-left: 0px;">
                 {% for announcement in announcements %}
-                <li class="mb-2" style="list-style-type: none; padding-right: 40px; border: 1px solid #000; border-radius: 3%;">
+                <li class="mb-2" style="list-style-type: none; padding-right: 5x; border: 1px solid #000; border-radius: 3%;">
                   <div class="row me-0 mt-3">
                     <div class="col-sm-9" style="text-align: left; padding-left: 25px;">   
-                        <h6>{{announcement['user_name']}}</h6>      
+                        <h6  style="word-break: break-all; margin-right: 25px;">{{announcement['user_name']}}</h6>    
+                       
                     </div>
                     <div class="col-sm-3">
-                        <h6>{{announcement['announcement_date']}}</h6>
+                        <h6  style="word-break: break-all; margin-left: -50px; margin-right: 0px;">{{announcement['announcement_date']}}</h6>
                     </div>
+                   
 
-                    <h5 style = "padding-left: 25px; text-align: left;">{{ announcement['announcement_name'] }}</h5>
-                    <p style = "padding-left: 25px; text-align: left;">{{announcement['announcement_description']}}</p>
+                    <h6 style = "margin-top:10px; padding-left: 25px; text-align: left; word-break: break-all;">{{ announcement['announcement_name'] }}</h6>
+                    <h6 style = "padding-left: 25px; text-align: left; word-break: break-all;">"{{announcement['announcement_description']}}"</h6>
                     <a href="/projectAnnouncement/{{announcement['announcement_id']}}" style="text-align: right;"><p>Comentarios</p></a>
                   </div>
                 </li>
                 {% endfor %}
               </ul>
         </div>
-        <div class="col-sm-3" style="padding-left: 50px;">            
-            <ul class="ms-0" style="padding-right: 40px; border: 1px solid #000; border-radius: 10%;">
+        <div class="col-sm-3" style="padding-left: 0px; padding-right: 5px;">            
+            <ul class="ms-0" style="padding-right: 10px; border: 1px solid #000; border-radius: 10%;">
                 <h5>Participantes: </h5>
                 {% for participant in participants %}
                 <li style="text-align: left; " >
                   <div>
-                    <h5>{{ participant['user_name'] }}</h5>
+                    <h5  style="word-break: break-all;">{{ participant['user_name'] }}</h5>
                   </div>
                 </li>
                 {% endfor %}
