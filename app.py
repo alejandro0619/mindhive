@@ -1,6 +1,6 @@
 from flask import Flask
 from flask_mysqldb import MySQL
-
+from flask_mail import Mail, Message
 
 from routes.auth import auth_bp
 from routes.user import user_bp

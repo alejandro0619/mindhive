@@ -4,6 +4,7 @@ import MySQLdb.cursors
 from datetime import date, datetime
 import re
 import hashlib
+from flask_mail import Mail, Message
 
 from lib.shareable_code import gen_shareable_code
 from lib.query_dispatcher import dispatcher
@@ -128,6 +129,12 @@ def profile_view():
 
 @user_bp.route("/createProject", methods=['GET', 'POST'])
 def create_project_view():
+    # mail = Mail(current_app)
+    # msg = Message('Hello', sender = 'mindhive025@gmail.com', recipients = ['isabelcrisdiazg@gmail.com', 'juan2.manuelbarreto@gmail.com'])
+    # msg.body = "Esto es un email de prueba para mindhive"
+    # mail.send(msg)
+
+
     mysql = current_app.config['MYSQL']
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     if request.method == "POST":
@@ -419,7 +426,7 @@ def project_view(id):
         # Rest of the code
 
             project_announcements= """
-            SELECT announcement.announcement_name, announcement.announcement_id, announcement.announcement_description, announcement.announcement_date, user.uid, user.user_name FROM announcement JOIN user on user.uid = announcement.user_uid WHERE Project_project_id = %s 
+            SELECT announcement.announcement_name, announcement.announcement_id, announcement.announcement_description, announcement.announcement_date, user.uid, user.user_name FROM announcement JOIN user on user.uid = announcement.user_uid WHERE Project_project_id = %s ORDER BY announcement.announcement_date 
               """
             cursor.execute(project_announcements, (id,))
             announcements = [announcement for announcement in cursor.fetchall()]
@@ -454,8 +461,18 @@ def create_activity(id):
         INSERT INTO activity VALUES (NULL, %s, %s, 0)
         """
         cursor.execute(activity_insert, (activity_title, id,))
-
         mysql.connection.commit()
+
+        get_recipients = "SELECT user.email as email from user JOIN user_has_project ON user_has_project.User_uid = user.uid JOIN project ON project.project_id = user_has_project.Project_project_id WHERE project.project_id = %s;"
+        cursor.execute(get_recipients, (project['project_id'],))
+        recipients = cursor.fetchall()
+        list_recipients=[]
+        for recipient in recipients:
+           list_recipients.append( recipient['email'] )
+        print(list_recipients)
+        mail = Mail(current_app)
+        msg = Message(sender = 'mindhive025@gmail.com', recipients = list_recipients, subject="Notificación Mindhive", body=("Se ha registrado una actividad nueva en el proyecto: ' "+str(project['project_title'])+"' al que pertenece. Ingrese a MindHive para visualizarlo "))
+        mail.send(msg)
         return redirect(url_for('user.project_view', id=id))     
 
     elif request.method == 'GET':
@@ -541,6 +558,17 @@ def create_announcement(id):
         cursor.execute(announcement_insert, (announcement_title, announcement_description, session['uid'], id))
         test = cursor.fetchall()
         mysql.connection.commit()
+
+        get_recipients = "SELECT user.email as email from user JOIN user_has_project ON user_has_project.User_uid = user.uid JOIN project ON project.project_id = user_has_project.Project_project_id WHERE project.project_id = %s;"
+        cursor.execute(get_recipients, (project['project_id'],))
+        recipients = cursor.fetchall()
+        list_recipients=[]
+        for recipient in recipients:
+           list_recipients.append( recipient['email'] )
+        print(list_recipients)
+        mail = Mail(current_app)
+        msg = Message(sender = 'mindhive025@gmail.com', recipients = list_recipients, subject="Notificación Mindhive", body=("Se ha registrado un anuncio nuevo en el proyecto:  '"+str(project['project_title'])+"' al que pertenece. Ingrese a MindHive para visualizarlo"))
+        mail.send(msg)
         return redirect(url_for('user.project_view', id=id))     
 
     elif request.method == 'GET':
@@ -580,11 +608,26 @@ def announcement(id):
                 """
         cursor.execute(query, (id,))
         announcement = cursor.fetchone()
+
+        get_project = "SELECT * from project join announcement on announcement.project_project_id = project.project_id where announcement.announcement_id = %s"
+        cursor.execute(get_project, (id,))
+        project = cursor.fetchone()
+
+        get_recipients = "SELECT user.email as email from user JOIN user_has_project ON user_has_project.User_uid = user.uid JOIN project ON project.project_id = user_has_project.Project_project_id WHERE project.project_id = %s;"
+        cursor.execute(get_recipients, (announcement['project_project_id'],))
+        recipients = cursor.fetchall()
+        list_recipients=[]
+        for recipient in recipients:
+           list_recipients.append( recipient['email'] )
+        print(list_recipients)
+        mail = Mail(current_app)
+        msg = Message(sender = 'mindhive025@gmail.com', recipients = list_recipients, subject="Notificación Mindhive", body=("Se ha registrado un nuevo comentario en el anuncio: ' "+str(announcement['announcement_name'])+"' del proyecto: '"+str(project['project_title'])+ "' al que pertenece. Ingrese en MindHive para visualizarlo"))
+        mail.send(msg)
         
         cursor.execute(insert_comment, (commentary, session['uid'], announcement['announcement_id'],))   
         mysql.connection.commit()
         comment_query = """
-            SELECT comment.comment_id, comment_content, comment.comment_date, comment.User_uid, user.user_name  FROM comment JOIN user ON user.uid = comment.User_uid WHERE comment.Announcement_announcement_id = %s;
+            SELECT comment.comment_id, comment_content, comment.comment_date, comment.User_uid, user.user_name  FROM comment JOIN user ON user.uid = comment.User_uid WHERE comment.Announcement_announcement_id = %s ORDER BY comment.comment_date;
             """
         cursor.execute(comment_query, (announcement['announcement_id'],))
         comments = [comment for comment in cursor.fetchall()]
