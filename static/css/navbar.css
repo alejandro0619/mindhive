@@ -1,5 +1,8 @@
 /* navbar.css */
 
+body {
+  background-color: #eeeeee;
+}
 /* Customize the background color of the navbar */
 .navbar {
     background-color: #343a40;
@@ -60,7 +63,7 @@
   }
 
   .navbar2 {
-    background-color: #ffffff;
+    background-color: #eeeeee;
     /* Add additional styles for the second navbar */
   }
   
