@@ -129,10 +129,7 @@ def profile_view():
 
 @user_bp.route("/createProject", methods=['GET', 'POST'])
 def create_project_view():
-    # mail = Mail(current_app)
-    # msg = Message('Hello', sender = 'mindhive025@gmail.com', recipients = ['isabelcrisdiazg@gmail.com', 'juan2.manuelbarreto@gmail.com'])
-    # msg.body = "Esto es un email de prueba para mindhive"
-    # mail.send(msg)
+
 
 
     mysql = current_app.config['MYSQL']
@@ -213,7 +210,8 @@ def edit_project(id):
         if (str(project_creator_id['User_project_creator']) == str(uid)):
             return render_template("projectCreate.html", route = "editProject", project_id = '/' + id, title_label = "Edición", button_label = 'Editar proyecto')
         else:
-            return redirect(url_for('user.root'))
+            msg="Sólo el creador del proyecto puede editarlo"
+            return redirect(url_for('user.project_view', id=id, msg=msg ))
         
 @user_bp.route("/deleteAnnouncement/<id>", methods=['GET'])
 def delete_announcement(id):
@@ -226,7 +224,8 @@ def delete_announcement(id):
     project = announcement['Project_project_id']
 
     if announcement['User_uid'] != session['uid']:
-        return redirect(url_for('user.announcement', id=announcement['announcement_id']))
+        msg="Sólo el creador del anuncio puede eliminarlo"
+        return redirect(url_for('user.announcement', id=announcement['announcement_id'], msg=msg))
     else:
 
         query = "DELETE FROM announcement WHERE announcement_id = %s"
@@ -264,7 +263,7 @@ def edit_announcement(project_id, id):
 
     elif request.method == 'GET':
         uid = session['uid']
-        print("Wtf", announcement)
+        
 
         query = "SELECT User_uid from announcement where announcement_id = %s"
         cursor.execute(query, (id, ))
@@ -273,7 +272,8 @@ def edit_announcement(project_id, id):
         if (str(announcement_creator_id['User_uid']) == str(uid)):
             return render_template("announcementCreate.html",project=project, route = "editAnnouncement", announcement_id = '/' + id, title_label = "Edición", button_label = 'Editar')
         else:
-            return redirect(url_for('user.announcement', id=announcement['announcement_id']))
+            msg="Sólo el creador del anuncio puede editarlo"
+            return redirect(url_for('user.announcement', id=announcement['announcement_id'], msg=msg))
         
 @user_bp.route("/editComment/<id>", methods=["GET", 'POST'])
 def edit_comment(id):
@@ -286,7 +286,8 @@ def edit_comment(id):
     if "loggedin" in session:
         if request.method =="GET":
             if comment['User_uid'] != session['uid']:
-                return redirect(url_for("user.announcement", id=comment['announcement_id']))
+                msg="Sólo el creador del comentario puede editarlo"
+                return redirect(url_for("user.announcement", id=comment['announcement_id'], msg=msg))
             else:
                 return render_template("commentEdit.html", comment=comment)
             
@@ -310,7 +311,8 @@ def delete_comment(id):
     if "loggedin" in session:
         print("hola ",comment)
         if (comment['User_uid'] != session['uid']):
-            return redirect(url_for("user.announcement", id=comment['Announcement_announcement_id']))
+            msg="Sólo el creador del comentario puede eliminarlo"
+            return redirect(url_for("user.announcement", id=comment['Announcement_announcement_id'], msg=msg))
         else:
             cursor.execute("DELETE FROM COMMENT WHERE COMMENT_ID = %s", (id,))
             mysql.connection.commit()
@@ -330,7 +332,9 @@ def delete_project(id):
     project_creator_id = cursor.fetchone()
 
     if project_creator_id['creator'] != session['uid']:
-        return redirect(url_for("user.root"))
+        msg="Sólo el creador del proyecto puede eliminarlo"
+        return redirect(url_for('user.project_view', id=id, msg=msg ))
+        
     else:
         query = "DELETE FROM project WHERE project_id = %s"
         cursor.execute(query, (id,))
@@ -359,8 +363,8 @@ def leave_project(id):
         return redirect(url_for("user.root"))
     else:
         # socket.emit('show_notification', "Eres el creador del proyecto, no puedes salir.")
-        messages.append("Eres el creador del proyecto, no puedes salir")
-        return redirect(url_for("user.root"))
+        msg="Usted es el creador del proyecto, no puede salir del mismo, pero puede eliminarlo si lo desea "
+        return redirect(url_for('user.project_view', id=id, msg=msg ))
     
 
 @user_bp.route('/adduser', methods=['POST'])
@@ -406,6 +410,7 @@ def add_member():
 
 @user_bp.route("/viewProject/<id>", methods=['GET'])
 def project_view(id):
+    msg=""
     if request.method == 'GET':
         if 'loggedin' in session: 
             query = """
@@ -440,7 +445,7 @@ def project_view(id):
             # print(announcements)
             # print(participants)
 
-            return render_template("project.html", project_id = id, project = project, activities = activities, announcements = announcements, participants=participants)
+            return render_template("project.html", project_id = id, project = project, activities = activities, announcements = announcements, participants=participants, msg=msg)
         else:
             return redirect(url_for("auth.login"))
         
@@ -596,6 +601,7 @@ def share_code(id):
         
 @user_bp.route("/projectAnnouncement/<id>", methods=['GET', 'POST'])
 def announcement(id):
+     msg=""
      if request.method == 'POST':
         mysql = current_app.config['MYSQL']
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)

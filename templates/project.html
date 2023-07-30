@@ -36,8 +36,8 @@
         <row class="ms-3" style="padding-right: 50px;">
             <h3 class="text-align=left mb-3"  style="word-break: break-all;">{{project['project_title']}}</h3>
             <p class="text-align=left mb-0"  style="word-break: break-all;">"{{project['project_description']}}"</p>
+            <div class="msg">{{msg}}</div>
         </row>
-        
         <select id="{{ project['project_id'] }}" style="max-width: 40px; margin-left: -10px; margin-right: 10px;" onchange="modifyProject('{{ project['project_id'] }}')"> 
             <option value="">...</option>
             <option value="editar">Editar Proyecto</option>
